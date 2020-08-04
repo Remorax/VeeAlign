@@ -63,6 +63,14 @@ class DataParser():
             return data
         return all_mappings
 
+    def path_to_root(self, element, parents_dict):
+        # Extracts the path to the root recursively, 
+        # i.e. all the "ancestral" nodes that lie from current node to root node
+        if element not in parents_dict or not parents_dict[element]:
+            return []
+        output = flatten([[e] + self.path_to_root(e, parents_dict) for e in parents_dict[element]])
+        return output
+
     def construct_abbreviation_resolution_dict(self, all_mappings):
         # Constructs an abbrevation resolution dict
         print ("Constructing abbrevation resolution dict....")
@@ -229,7 +237,7 @@ class DataParser():
             neighbours_dict[e2].append(e1)
         
         rootpath_dict = ont_obj.parents_dict
-        rootpath_dict = {elem: path_to_root(elem, rootpath_dict) for elem in rootpath_dict}
+        rootpath_dict = {elem: self.path_to_root(elem, rootpath_dict) for elem in rootpath_dict}
         ont = ont.split("/")[-1].split(".")[0]
 
         for entity in neighbours_dict:
