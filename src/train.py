@@ -55,7 +55,7 @@ class SiameseNetwork(nn.Module):
     def __init__(self):
         super().__init__() 
         self.embedding_dim = np.array(emb_vals).shape[1]
-        self.n = int(sys.argv[1])
+        self.n = max_neighbours
         self.v = nn.Parameter(torch.DoubleTensor([1/(self.n-1) for i in range(self.n-1)]))
         self.output = nn.Linear(2*self.embedding_dim, 300)
         self.cosine_sim_layer = nn.CosineSimilarity(dim=1)
