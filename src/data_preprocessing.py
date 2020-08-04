@@ -122,7 +122,7 @@ class DataParser():
         return [m.group(0) for m in matches]
 
     def parse(self, word):
-        return flatten([el.split("_") for el in camel_case_split(word)])
+        return flatten([el.split("_") for el in self.camel_case_split(word)])
 
     def run_abbreviation_resolution(self, inp, filtered_dict):
         # Resolving abbreviations to full forms
@@ -154,7 +154,7 @@ class DataParser():
             extracted_elems.extend([ont_name + "#" + elem for elem in entities + props + triples])
 
         extracted_elems = list(set(extracted_elems))
-        inp = [" ".join(parse(word.split("#")[1])) for word in extracted_elems]
+        inp = [" ".join(self.parse(word.split("#")[1])) for word in extracted_elems]
         print ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
 
         extracted_elems = ["<UNK>"] + extracted_elems
