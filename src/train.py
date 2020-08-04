@@ -1,9 +1,6 @@
-import itertools, pickle, sys, requests, re, configparser
-import tensorflow_hub as hub
+import configparser
 import numpy as np
-from xml.dom import minidom
 from collections import OrderedDict
-from scipy import spatial
 from math import ceil
 import torch
 from torch import nn

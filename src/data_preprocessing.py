@@ -261,6 +261,6 @@ class DataParser():
             inp_resolved = self.run_spellcheck(inp_resolved)
         inp_filtered = self.remove_stopwords(inp_resolved)
         emb_vals, emb_indexer, emb_indexer_inv = self.extract_embeddings(inp_filtered, extracted_elems)
-        neighbours_dicts = self.construct_neighbour_dicts(neighbours_dicts)
+        neighbours_dicts = self.construct_neighbour_dicts()
 
         return all_mappings, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts
