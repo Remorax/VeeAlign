@@ -101,8 +101,8 @@ def generate_input(elems, target):
 def count_non_unk(elem):
     return len([l for l in elem if l!="<UNK>"])
 
-neighbours_dicts = {ont: {el: neighbours_dicts[ont][el][:int(sys.argv[1])] for el in neighbours_dicts[ont]
-       if count_non_unk(neighbours_dicts[ont][el]) > int(sys.argv[2])} for ont in neighbours_dicts}
+neighbours_dicts = {ont: {el: neighbours_dicts[ont][el][:max_neighbours] for el in neighbours_dicts[ont]
+       if count_non_unk(neighbours_dicts[ont][el]) > min_neighbours} for ont in neighbours_dicts}
 
 data_items = train_data.items()
 np.random.shuffle(list(data_items))
