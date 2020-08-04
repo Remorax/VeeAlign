@@ -49,7 +49,7 @@ ontologies_in_alignment = [[train_folder + el  + ".owl" for el in l.split(".")[0
                            for l in os.listdir(alignment_folder)]
 
 # Preprocessing and parsing input data for training
-preprocessing = DataParser(train_folder, ontologies_in_alignment, USE_folder, gt_mappings)
+preprocessing = DataParser(ontologies_in_alignment, USE_folder, gt_mappings)
 train_data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts = preprocessing.process(spellcheck)
 
 

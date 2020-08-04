@@ -10,9 +10,8 @@ def cos_sim(a,b):
 
 class DataParser():
     """Data parsing class"""
-    def __init__(self, ontologies_folder, ontologies_in_alignment, USE_folder, gt_mappings=None):
+    def __init__(self, ontologies_in_alignment, USE_folder, gt_mappings=None):
         self.ontologies_in_alignment = ontologies_in_alignment
-        self.ontologies_folder = ontologies_folder
         self.USE_folder = USE_folder
         self.gt_mappings = gt_mappings
         self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
@@ -41,8 +40,8 @@ class DataParser():
         # Combinatorial mapping of entities in ontology pair(s)
         all_mappings = []
         for l in self.ontologies_in_alignment:
-            ont1 = Ontology(self.ontologies_folder + l[0] + ".owl")
-            ont2 = Ontology(self.ontologies_folder + l[1] + ".owl")
+            ont1 = Ontology(l[0])
+            ont2 = Ontology(l[1])
             
             ent1 = ont1.get_entities()
             ent2 = ont2.get_entities()
@@ -148,7 +147,7 @@ class DataParser():
         extracted_elems = []
 
         for ont_name in list(set(flatten(self.ontologies_in_alignment))):
-            ont = Ontology(self.ontologies_folder + ont_name + ".owl")
+            ont = Ontology(ont_name)
             entities = ont.get_entities()
             props = ont.get_object_properties() + ont.get_data_properties()
             triples = list(set(flatten(ont.get_triples())))
@@ -221,7 +220,7 @@ class DataParser():
         return emb_vals, emb_indexer, emb_indexer_inv
 
     def get_one_hop_neighbours(self, ont):
-        ont_obj = Ontology(self.ontologies_folder + ont + ".owl")
+        ont_obj = Ontology(ont)
         triples = ont_obj.get_triples()
         entities = [(a,b) for (a,b,c) in triples]
         neighbours_dict = {elem: [elem] for elem in list(set(flatten(entities)))}
