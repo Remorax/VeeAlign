@@ -26,20 +26,20 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 # Initialize variables from config
-alignment_folder = config["Paths"]["alignment_folder"]
-train_folder = config["Paths"]["train_folder"]
-model_path = config["Paths"]["model_path"]
+alignment_folder = str(config["Paths"]["alignment_folder"])
+train_folder = str(config["Paths"]["train_folder"])
+model_path = str(config["Paths"]["model_path"])
 
-USE_folder = config["USE Embeddings"]["USE_folder"]
-spellcheck = config["Preprocessing"]["has_spellcheck"]
+USE_folder = str(config["USE Embeddings"]["USE_folder"])
+spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
-max_neighbours = config["Parameters"]["max_neighbours"]
-min_neighbours = config["Parameters"]["min_neighbours"]
+max_neighbours = int(config["Parameters"]["max_neighbours"])
+min_neighbours = int(config["Parameters"]["min_neighbours"])
 
-lr = config["Hyperparameters"]["lr"]
-num_epochs = config["Hyperparameters"]["num_epochs"]
-weight_decay = config["Hyperparameters"]["weight_decay"]
-batch_size = config["Hyperparameters"]["batch_size"]
+lr = float(config["Hyperparameters"]["lr"])
+num_epochs = int(config["Hyperparameters"]["num_epochs"])
+weight_decay = float(config["Hyperparameters"]["weight_decay"])
+batch_size = int(config["Hyperparameters"]["batch_size"])
 
 
 reference_alignments = load_alignments(alignment_folder)
