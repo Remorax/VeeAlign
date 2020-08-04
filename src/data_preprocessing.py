@@ -209,7 +209,7 @@ class DataParser():
 
     def extract_embeddings(self, inp, extracted_elems):
         # Creates embeddings to index dict, word to index dict etc
-        embeds = np.array(extractUSEEmbeddings(inp))
+        embeds = np.array(self.extractUSEEmbeddings(inp))
         embeds = np.array([np.zeros(embeds.shape[1],)] + list(embeds))
         embeddings = dict(zip(extracted_elems, embeds))
 
