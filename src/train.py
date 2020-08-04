@@ -108,7 +108,7 @@ data_items = train_data.items()
 np.random.shuffle(list(data_items))
 train_data = OrderedDict(data_items)
 
-print ("Number of entities:", len(data))
+print ("Number of entities:", len(train_data))
 
 all_metrics = []
 torch.set_default_dtype(torch.float64)
