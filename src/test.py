@@ -22,7 +22,7 @@ spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
 max_neighbours = int(config["Parameters"]["max_neighbours"])
 min_neighbours = int(config["Parameters"]["min_neighbours"])
-threshold = int(config["Parameters"]["threshold"])
+threshold = float(config["Parameters"]["threshold"])
 batch_size = int(config["Hyperparameters"]["batch_size"])
 
 test_ontologies = [tuple([ont_name1, ont_name2])]
@@ -117,11 +117,10 @@ with torch.no_grad():
         batch_end = (batch_idx+1) * batch_size
 
         inputs = inputs_all[batch_start: batch_end]
-        inputs = np.apply_along_axis(embed, 2, inputs)
-
         inp = inputs.transpose(1,0,2)
+        inputs = np.apply_along_axis(embed, 2, inputs)
         
-        inp_elems = torch.LongTensor(inputs).to(device)
+        inp_elems = torch.DoubleTensor(inputs).to(device)
 
         outputs = model(inp_elems)
         outputs = [el.item() for el in outputs]
