@@ -94,7 +94,7 @@ np.random.shuffle(test_data)
 print ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = SiameseNetwork().to(device)
-model.load_state_dict(torch.load(model_path))
+model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
 
 print ("Model loaded successfully!")
 
