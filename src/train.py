@@ -113,7 +113,6 @@ train_data = OrderedDict(data_items)
 
 print ("Number of entities:", len(train_data))
 
-all_metrics = []
 torch.set_default_dtype(torch.float64)
 
 train_data_t = [key for key in train_data if train_data[key]]
