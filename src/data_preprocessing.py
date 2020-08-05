@@ -164,7 +164,6 @@ class DataParser():
             extracted_elems.extend([ont_name_filt + "#" + elem for elem in entities + props + triples])
 
         extracted_elems = list(set(extracted_elems))
-        print ("Extracted elems", extracted_elems)
         inp = [" ".join(self.parse(word.split("#")[1])) for word in extracted_elems]
         print ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
 
@@ -265,7 +264,6 @@ class DataParser():
 
     def process(self, spellcheck=False):
         all_mappings = self.generate_mappings()
-        print ("All mappings", all_mappings)
         inp, extracted_elems = self.extract_keys()
         filtered_dict = self.construct_abbreviation_resolution_dict(all_mappings)
         inp_resolved = self.run_abbreviation_resolution(inp, filtered_dict)
