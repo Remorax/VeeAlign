@@ -94,7 +94,8 @@ def generate_input(elems, target):
         try:
             inputs.append(generate_data(elem))
             targets.append(target)
-        except:
+        except Exception as e:
+            print (e)
             continue
     return np.array(inputs), np.array(targets)
 
