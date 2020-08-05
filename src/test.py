@@ -164,7 +164,6 @@ precision = tp/(tp+fp)
 recall = tp/(tp+fn)
 f1score = 2 * precision * recall / (precision + recall)
 
-print ("Final Alignment: " + "\n".join(final_list))
+print ("Final Alignment: \n" + "\n".join(final_list))
 
-print ("Precision: {} Recall: {} F1-Score: {}".format(precision, recall, f1score))
 open("results.tsv", "w+").write("\n".join(final_list))
