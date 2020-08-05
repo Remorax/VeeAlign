@@ -54,7 +54,8 @@ class DataParser():
 
             mappings = list(itertools.product(ent1, ent2)) + list(itertools.product(obj1, obj2)) + list(itertools.product(data1, data2))
 
-            all_mappings.extend([(l[0] + "#" + el[0], l[1] + "#" + el[1]) for el in mappings])
+            all_mappings.extend([(l[0].split("/")[-1].split(".")[0] + "#" + el[0], 
+                                l[1].split("/")[-1].split(".")[0] + "#" + el[1]) for el in mappings])
 
         if self.gt_mappings:
             data = {mapping: False for mapping in all_mappings}
@@ -159,9 +160,11 @@ class DataParser():
             entities = ont.get_entities()
             props = ont.get_object_properties() + ont.get_data_properties()
             triples = list(set(flatten(ont.get_triples())))
-            extracted_elems.extend([ont_name + "#" + elem for elem in entities + props + triples])
+            ont_name_filt = ont_name.split("/")[-1].split(".")[0]
+            extracted_elems.extend([ont_name_filt + "#" + elem for elem in entities + props + triples])
 
         extracted_elems = list(set(extracted_elems))
+        print ("Extracted elems", extracted_elems)
         inp = [" ".join(self.parse(word.split("#")[1])) for word in extracted_elems]
         print ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
 
@@ -262,6 +265,7 @@ class DataParser():
 
     def process(self, spellcheck=False):
         all_mappings = self.generate_mappings()
+        print ("All mappings", all_mappings)
         inp, extracted_elems = self.extract_keys()
         filtered_dict = self.construct_abbreviation_resolution_dict(all_mappings)
         inp_resolved = self.run_abbreviation_resolution(inp, filtered_dict)
