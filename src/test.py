@@ -94,6 +94,8 @@ neighbours_dicts = {ont: {el: neighbours_dicts[ont][el][:max_neighbours] for el 
 
 np.random.shuffle(test_data)
 
+torch.set_default_dtype(torch.float64)
+
 print ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = SiameseNetwork().to(device)
@@ -142,10 +144,10 @@ with torch.no_grad():
         sim = cos_sim(emb_vals[direct_input[0]], emb_vals[direct_input[1]])
         all_results[(ent1, ent2)] = (sim, sim>=threshold)
     
-final_list = [(elem[0], elem[1], all_results[elem][0]) for elem in all_results if all_results[elem][1]]
+final_list = [(elem[0], elem[1], str(all_results[elem][0])) for elem in all_results if all_results[elem][1]]
 final_list = ["\t".join(elem) for elem in final_list]
 
-ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
+f = ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
 doc = minidom.parse("/data/Vivek/IBM/IBM-Internship/reference-alignment/" + f)
 ls = list(zip(doc.getElementsByTagName('entity1'), doc.getElementsByTagName('entity2')))
 gt = [(a.getAttribute('rdf:resource'), b.getAttribute('rdf:resource')) for (a,b) in ls]

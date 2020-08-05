@@ -255,7 +255,7 @@ class DataParser():
     def construct_neighbour_dicts(self, neighbours=None):
         neighbours_dicts = {ont.split("/")[-1].split(".")[0]: self.get_one_hop_neighbours(ont) 
                             for ont in list(set(flatten(self.ontologies_in_alignment)))}
-        if neighbours:
+        if not neighbours:
             max_neighbours = np.max(flatten([[len(el[e]) for e in el] for el in neighbours_dicts.values()]))
         else:
             max_neighbours = neighbours
