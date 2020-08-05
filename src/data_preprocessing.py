@@ -252,17 +252,20 @@ class DataParser():
         neighbours_dict = {ont + "#" + el: [ont + "#" + e for e in neighbours_dict[el]] for el in neighbours_dict}
         return neighbours_dict
 
-    def construct_neighbour_dicts(self):
+    def construct_neighbour_dicts(self, neighbours=None):
         neighbours_dicts = {ont.split("/")[-1].split(".")[0]: self.get_one_hop_neighbours(ont) 
                             for ont in list(set(flatten(self.ontologies_in_alignment)))}
-        max_neighbours = np.max(flatten([[len(el[e]) for e in el] for el in neighbours_dicts.values()]))
+        if neighbours:
+            max_neighbours = np.max(flatten([[len(el[e]) for e in el] for el in neighbours_dicts.values()]))
+        else:
+            max_neighbours = neighbours
         neighbours_lens = {ont: {key: len(neighbours_dicts[ont][key]) for key in neighbours_dicts[ont]}
                            for ont in neighbours_dicts}
         neighbours_dicts = {ont: {key: neighbours_dicts[ont][key] + ["<UNK>" for i in range(max_neighbours -len(neighbours_dicts[ont][key]))]
                       for key in neighbours_dicts[ont]} for ont in neighbours_dicts}
         return neighbours_dicts
 
-    def process(self, spellcheck=False):
+    def process(self, spellcheck=False, neighbours=None):
         all_mappings = self.generate_mappings()
         inp, extracted_elems = self.extract_keys()
         filtered_dict = self.construct_abbreviation_resolution_dict(all_mappings)
@@ -271,6 +274,6 @@ class DataParser():
             inp_resolved = self.run_spellcheck(inp_resolved)
         inp_filtered = self.remove_stopwords(inp_resolved)
         emb_vals, emb_indexer, emb_indexer_inv = self.extract_embeddings(inp_filtered, extracted_elems)
-        neighbours_dicts = self.construct_neighbour_dicts()
+        neighbours_dicts = self.construct_neighbour_dicts(neighbours)
 
         return all_mappings, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts

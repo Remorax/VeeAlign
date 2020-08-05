@@ -29,7 +29,7 @@ test_ontologies = [tuple([ont_name1, ont_name2])]
 
 # Preprocessing and parsing input data for testing
 preprocessing = DataParser(test_ontologies, USE_folder)
-test_data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts = preprocessing.process(spellcheck)
+test_data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts = preprocessing.process(spellcheck, max_neighbours)
 
 class SiameseNetwork(nn.Module):
     # Defines the Siamese Network model
