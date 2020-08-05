@@ -85,7 +85,7 @@ class SiameseNetwork(nn.Module):
         return x
 
 def generate_data(elem_tuple):
-    return np.array([[emb_vals[emb_indexer[el]] for el in neighbours_dicts[elem.split("#")[0]][elem]] for elem in elem_tuple])
+    return np.array([[emb_indexer[el] for el in neighbours_dicts[elem.split("#")[0]][elem]] for elem in elem_tuple])
 
 def generate_input(elems, target):
     inputs, targets = [], []
@@ -101,6 +101,9 @@ def generate_input(elems, target):
 
 def count_non_unk(elem):
     return len([l for l in elem if l!="<UNK>"])
+
+def embed(inputs):
+    return np.array([emb_vals[idx] for idx in inputs])
 
 neighbours_dicts = {ont: {el: neighbours_dicts[ont][el][:max_neighbours] for el in neighbours_dicts[ont]
        if count_non_unk(neighbours_dicts[ont][el]) > min_neighbours} for ont in neighbours_dicts}
@@ -147,8 +150,9 @@ for epoch in range(num_epochs):
         
         inputs = inputs_all[batch_start: batch_end]
         targets = targets_all[batch_start: batch_end]
+        inputs = np.apply_along_axis(embed, 2, inputs)
         
-        inp_elems = torch.LongTensor(inputs).to(device)
+        inp_elems = torch.DoubleTensor(inputs).to(device)
         targ_elems = torch.DoubleTensor(targets).to(device)
         optimizer.zero_grad()
         outputs = model(inp_elems)
