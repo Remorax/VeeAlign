@@ -65,6 +65,9 @@ class SiameseNetwork(nn.Module):
         x = self.cosine_sim_layer(results[0], results[1])
         return x
 
+def count_non_unk(elem):
+    return len([l for l in elem if l!="<UNK>"])
+
 def generate_data_neighbourless(elem_tuple):
     op = np.array([emb_indexer[elem] for elem in elem_tuple])
     return op
@@ -141,4 +144,25 @@ with torch.no_grad():
     
 final_list = [(elem[0], elem[1], all_results[elem][0]) for elem in all_results if all_results[elem][1]]
 final_list = ["\t".join(elem) for elem in final_list]
+
+ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
+doc = minidom.parse("/data/Vivek/IBM/IBM-Internship/reference-alignment/" + f)
+ls = list(zip(doc.getElementsByTagName('entity1'), doc.getElementsByTagName('entity2')))
+gt = [(a.getAttribute('rdf:resource'), b.getAttribute('rdf:resource')) for (a,b) in ls]
+gt = [tuple([elem.split("/")[-1] for elem in el]) for el in gt]
+
+pred = [(elem[0], elem[1]) for elem in all_results if all_results[elem][1]]
+fn_list = [key for key in gt if key not in set(pred)]
+fp_list = [elem for elem in pred if elem not in gt]
+tp_list = [elem for elem in pred if elem in gt]
+
+tp, fn, fp = len(tp_list), len(fn_list), len(fp_list)
+
+precision = tp/(tp+fp)
+recall = tp/(tp+fn)
+f1score = 2 * precision * recall / (precision + recall)
+
+print ("Final Alignment: " + "\n".join(final_list))
+
+print ("Precision: {} Recall: {} F1-Score: {}".format(precision, recall, f1score))
 open("results.tsv", "w+").write("\n".join(final_list))
