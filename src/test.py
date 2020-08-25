@@ -89,6 +89,44 @@ def generate_input(elems):
 def embed(inputs):
     return np.array([emb_vals[idx] for idx in inputs])
 
+def write_results():
+    ont_name_parsed1 = "http://" + ont_name1.split("/")[-1].split(".")[0]
+    ont_name_parsed2 = "http://" + ont_name2.split("/")[-1].split(".")[0]
+    rdf = """<?xml version='1.0' encoding='utf-8' standalone='no'?>
+    <rdf:RDF xmlns='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'
+             xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+             xmlns:xsd='http://www.w3.org/2001/XMLSchema#'
+             xmlns:align='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'>
+    <Alignment>
+      <xml>yes</xml>
+      <level>0</level>
+      <type>**</type>
+      <onto1>
+        <Ontology rdf:about="{}">
+          <location>{}</location>
+        </Ontology>
+      </onto1>
+      <onto2>
+        <Ontology rdf:about="{}">
+          <location>{}</location>
+        </Ontology>
+      </onto2>""".format(ont_name_parsed1, ont_name1, ont_name_parsed2, ont_name2)
+    for (a,b,score) in final_list:
+        mapping = """
+        <map>
+          <Cell>
+            <entity1 rdf:resource='{}'/>
+            <entity2 rdf:resource='{}'/>
+            <relation>=</relation>
+            <measure rdf:datatype='http://www.w3.org/2001/XMLSchema#float'>{}</measure>
+          </Cell>
+        </map>""".format(ont_name_parsed1 + "#" + a.split("#")[-1], ont_name_parsed2 + "#" + b.split("#")[-1], score)
+    rdf += """
+    </Alignment>
+    </rdf:RDF>
+    """
+    return rdf
+
 neighbours_dicts = {ont: {el: neighbours_dicts[ont][el][:max_neighbours] for el in neighbours_dicts[ont]
        if count_non_unk(neighbours_dicts[ont][el]) > min_neighbours} for ont in neighbours_dicts}
 
@@ -144,26 +182,8 @@ with torch.no_grad():
         sim = cos_sim(emb_vals[direct_input[0]], emb_vals[direct_input[1]])
         all_results[(ent1, ent2)] = (sim, sim>=threshold)
     
-final_list = [(elem[0], elem[1], str(all_results[elem][0])) for elem in all_results if all_results[elem][1]]
-final_list = ["\t".join(elem) for elem in final_list]
+final_list = [(elem[0], elem[1], str(round(all_results[elem][0], 3))) for elem in all_results if all_results[elem][1]]
 
-f = ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
-doc = minidom.parse("/data/Vivek/IBM/IBM-Internship/reference-alignment/" + f)
-ls = list(zip(doc.getElementsByTagName('entity1'), doc.getElementsByTagName('entity2')))
-gt = [(a.getAttribute('rdf:resource'), b.getAttribute('rdf:resource')) for (a,b) in ls]
-gt = [tuple([elem.split("/")[-1] for elem in el]) for el in gt]
+f = "VeeAlign-" + ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
 
-pred = [(elem[0], elem[1]) for elem in all_results if all_results[elem][1]]
-fn_list = [key for key in gt if key not in set(pred)]
-fp_list = [elem for elem in pred if elem not in gt]
-tp_list = [elem for elem in pred if elem in gt]
-
-tp, fn, fp = len(tp_list), len(fn_list), len(fp_list)
-
-precision = tp/(tp+fp)
-recall = tp/(tp+fn)
-f1score = 2 * precision * recall / (precision + recall)
-
-print ("Final Alignment: \n" + "\n".join(final_list))
-
-open("results.tsv", "w+").write("\n".join(final_list))
+open(f, "wb").write(write_results())
