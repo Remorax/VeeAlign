@@ -119,7 +119,7 @@ def write_results():
     <Ontology rdf:about="{}">
       <location>{}</location>
     </Ontology>
-  </onto2>""".format(ont_name_parsed1, ont_name1, ont_name_parsed2, ont_name2)
+  </onto2>""".format(ont_name_parsed1, "file://" + ont_name1, ont_name_parsed2, "file://" + ont_name2)
     for (a,b,score) in final_list:
         mapping = """
   <map>
