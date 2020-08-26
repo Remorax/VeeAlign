@@ -121,6 +121,7 @@ def write_results():
             <measure rdf:datatype='http://www.w3.org/2001/XMLSchema#float'>{}</measure>
           </Cell>
         </map>""".format(ont_name_parsed1 + "#" + a.split("#")[-1], ont_name_parsed2 + "#" + b.split("#")[-1], score)
+        rdf += mapping
     rdf += """
     </Alignment>
     </rdf:RDF>
