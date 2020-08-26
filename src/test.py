@@ -15,11 +15,11 @@ if ont_name1.endswith("/"):
 if ont_name2.endswith("/"):
     ont_name2 = ont_name2[:-1]
 
+prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1]) + "/"
+
 # Read `config.ini` and initialize parameter values
 config = configparser.ConfigParser()
-config.read('config.ini')
-
-prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1]) + "/"
+config.read(prefix_path + 'src/config.ini')
 
 logging.info ("Prefix path: ", prefix_path)
 
@@ -197,4 +197,4 @@ f = "VeeAlign-" + ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split
 
 open(output_path + f, "w+").write(write_results())
 
-print(output_path + f)
+print("file://" + output_path + f)
