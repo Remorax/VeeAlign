@@ -16,7 +16,7 @@ class Ontology():
         '''
         self.ontology = ontology
         if ontology.startswith("https://") or ontology.startswith("http://"):
-            self.ontology_obj = minidom.parse(urlopen(ontology))
+            self.ontology_obj = minidom.parse(urlopen(ontology + "/"))
         else:
             self.ontology_obj = minidom.parse(ontology)
         self.root = self.ontology_obj.documentElement # root node

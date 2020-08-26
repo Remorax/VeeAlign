@@ -10,6 +10,10 @@ from ontology import *
 from data_preprocessing import *
 
 ont_name1, ont_name2 = sys.argv[1], sys.argv[2]
+if ont_name1.endswith("/"):
+    ont_name1 = ont_name1[:-1]
+if ont_name2.endswith("/"):
+    ont_name2 = ont_name2[:-1]
 
 # Read `config.ini` and initialize parameter values
 config = configparser.ConfigParser()
