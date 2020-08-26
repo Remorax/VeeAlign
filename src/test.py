@@ -98,39 +98,38 @@ def write_results():
     ont_name_parsed2 = "http://" + ont_name2.split("/")[-1].split(".")[0]
     rdf = \
     """<?xml version='1.0' encoding='utf-8' standalone='no'?>
-    <rdf:RDF xmlns='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'
-             xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
-             xmlns:xsd='http://www.w3.org/2001/XMLSchema#'
-             xmlns:align='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'>
-    <Alignment>
-      <xml>yes</xml>
-      <level>0</level>
-      <type>**</type>
-      <onto1>
-        <Ontology rdf:about="{}">
-          <location>{}</location>
-        </Ontology>
-      </onto1>
-      <onto2>
-        <Ontology rdf:about="{}">
-          <location>{}</location>
-        </Ontology>
-      </onto2>""".format(ont_name_parsed1, ont_name1, ont_name_parsed2, ont_name2)
+<rdf:RDF xmlns='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'
+         xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+         xmlns:xsd='http://www.w3.org/2001/XMLSchema#'
+         xmlns:align='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'>
+<Alignment>
+  <xml>yes</xml>
+  <level>0</level>
+  <type>**</type>
+  <onto1>
+    <Ontology rdf:about="{}">
+      <location>{}</location>
+    </Ontology>
+  </onto1>
+  <onto2>
+    <Ontology rdf:about="{}">
+      <location>{}</location>
+    </Ontology>
+  </onto2>""".format(ont_name_parsed1, ont_name1, ont_name_parsed2, ont_name2)
     for (a,b,score) in final_list:
         mapping = """
-        <map>
-          <Cell>
-            <entity1 rdf:resource='{}'/>
-            <entity2 rdf:resource='{}'/>
-            <relation>=</relation>
-            <measure rdf:datatype='http://www.w3.org/2001/XMLSchema#float'>{}</measure>
-          </Cell>
-        </map>""".format(ont_name_parsed1 + "#" + a.split("#")[-1], ont_name_parsed2 + "#" + b.split("#")[-1], score)
+  <map>
+    <Cell>
+      <entity1 rdf:resource='{}'/>
+      <entity2 rdf:resource='{}'/>
+      <relation>=</relation>
+      <measure rdf:datatype='http://www.w3.org/2001/XMLSchema#float'>{}</measure>
+    </Cell>
+  </map>""".format(ont_name_parsed1 + "#" + a.split("#")[-1], ont_name_parsed2 + "#" + b.split("#")[-1], score)
         rdf += mapping
     rdf += """
-    </Alignment>
-    </rdf:RDF>
-    """
+</Alignment>
+</rdf:RDF>"""
     return rdf
 
 neighbours_dicts = {ont: {el: neighbours_dicts[ont][el][:max_neighbours] for el in neighbours_dicts[ont]
