@@ -21,7 +21,7 @@ class DataParser():
     def extractUSEEmbeddings(self, words):
         # Extracts USE embeddings
         
-        word_embeddings = self.USE.embed(words)
+        word_embeddings = self.USE(words)
         return word_embeddings.numpy()
 
     def generate_mappings(self):
