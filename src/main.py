@@ -1,4 +1,4 @@
-import configparser
+import configparser, logging
 import numpy as np
 from collections import OrderedDict
 from math import ceil
@@ -89,7 +89,7 @@ def generate_data(elem_tuple):
 
 def generate_input(elems, target):
     inputs, targets = [], []
-    print ("Generating input data to model...")
+    logging.info ("Generating input data to model...")
     for elem in list(elems):
         try:
             inputs.append(generate_data(elem))
@@ -111,7 +111,7 @@ data_items = train_data.items()
 np.random.shuffle(list(data_items))
 train_data = OrderedDict(data_items)
 
-print ("Number of entities:", len(train_data))
+logging.info ("Number of entities:", len(train_data))
 
 torch.set_default_dtype(torch.float64)
 
@@ -127,7 +127,7 @@ model = SiameseNetwork().to(device)
 
 optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-print ("Starting training...")
+logging.info ("Starting training...")
 
 for epoch in range(num_epochs):
     inputs_pos, targets_pos = generate_input(train_data_t, 1)
@@ -159,7 +159,7 @@ for epoch in range(num_epochs):
         optimizer.step()
 
         if batch_idx%1000 == 0:
-            print ("Epoch: {} Idx: {} Loss: {}".format(epoch, batch_idx, loss.item()))
+            logging.info ("Epoch: {} Idx: {} Loss: {}".format(epoch, batch_idx, loss.item()))
 
-print ("Training complete!")
+logging.info ("Training complete!")
 torch.save(model.state_dict(), model_path)

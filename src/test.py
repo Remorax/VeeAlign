@@ -1,4 +1,4 @@
-import configparser, sys
+import configparser, sys, logging
 import numpy as np
 from collections import OrderedDict
 from math import ceil
@@ -21,7 +21,7 @@ config.read('config.ini')
 
 prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1]) + "/"
 
-print ("Prefix path: ", prefix_path)
+logging.info ("Prefix path: ", prefix_path)
 
 # Initialize variables from config
 model_path = prefix_path + str(config["Paths"]["model_path"])
@@ -85,7 +85,7 @@ def generate_data(elem_tuple):
 
 def generate_input(elems):
     inputs = []
-    print ("Generating input data to model...")
+    logging.info ("Generating input data to model...")
     for elem in list(elems):
         try:
             inputs.append(generate_data(elem))
@@ -143,12 +143,12 @@ np.random.shuffle(test_data)
 
 torch.set_default_dtype(torch.float64)
 
-print ("Loading trained model....")
+logging.info ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = SiameseNetwork().to(device)
 model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
 
-print ("Model loaded successfully!")
+logging.info ("Model loaded successfully!")
 
 model.eval()
 
@@ -181,10 +181,10 @@ with torch.no_grad():
             ent1 = emb_indexer_inv[inp[0][idx][0]]
             ent2 = emb_indexer_inv[inp[1][idx][0]]
             if (ent1, ent2) in all_results:
-                print ("Error: ", ent1, ent2, "already present")
+                logging.info ("Error: ", ent1, ent2, "already present")
             all_results[(ent1, ent2)] = (pred_elem, pred_elem>=threshold)
     
-    print ("Len (direct inputs): ", len(direct_inputs))
+    logging.info ("Len (direct inputs): ", len(direct_inputs))
     for idx, direct_input in enumerate(direct_inputs):
         ent1 = emb_indexer_inv[direct_input[0]]
         ent2 = emb_indexer_inv[direct_input[1]]
@@ -196,3 +196,5 @@ final_list = [(elem[0], elem[1], str(round(all_results[elem][0], 3))) for elem i
 f = "VeeAlign-" + ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
 
 open(output_path + f, "w+").write(write_results())
+
+print(output_path + f)

@@ -1,5 +1,5 @@
 from ontology import *
-import os, itertools, re
+import os, itertools, re, logging
 import tensorflow_hub as hub
 import numpy as np
 from scipy import spatial
@@ -61,7 +61,7 @@ class DataParser():
 
     def construct_abbreviation_resolution_dict(self, all_mappings):
         # Constructs an abbrevation resolution dict
-        print ("Constructing abbrevation resolution dict....")
+        logging.info ("Constructing abbrevation resolution dict....")
         abbreviations_dict = {}
         final_dict = {}
 
@@ -122,7 +122,7 @@ class DataParser():
 
     def run_abbreviation_resolution(self, inp, filtered_dict):
         # Resolving abbreviations to full forms
-        print ("Resolving abbreviations...")
+        logging.info ("Resolving abbreviations...")
         inp_resolved = []
         for concept in inp:
             for key in filtered_dict:
@@ -152,7 +152,7 @@ class DataParser():
 
         extracted_elems = list(set(extracted_elems))
         inp = [" ".join(self.parse(word.split("#")[1])) for word in extracted_elems]
-        print ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
+        logging.info ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
 
         extracted_elems = ["<UNK>"] + extracted_elems
 
@@ -161,7 +161,7 @@ class DataParser():
 
     def run_spellcheck(self, inp):
         # Spelling checker and corrector
-        print ("Running spellcheck...")
+        logging.info ("Running spellcheck...")
         url = "https://montanaflynn-spellcheck.p.rapidapi.com/check/"
 
         headers = {
@@ -187,7 +187,7 @@ class DataParser():
                         resolved = resolved.replace(word.lower(), response["corrections"][word][0].lower())
                         
                 
-                print ("Corrected {} to {}".format(concept, resolved))
+                logging.info ("Corrected {} to {}".format(concept, resolved))
                 inp_spellchecked.append(resolved)
             else:
                 inp_spellchecked.append(concept)
