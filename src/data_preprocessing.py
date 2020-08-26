@@ -15,25 +15,13 @@ class DataParser():
         self.USE_folder = USE_folder
         self.gt_mappings = gt_mappings
         self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
+        self.USE = hub.load(self.USE_link)
         self.stopwords = ["has"]
     
     def extractUSEEmbeddings(self, words):
         # Extracts USE embeddings
-        try:
-            embed = hub.KerasLayer(self.USE_folder)
-        except Exception as e:
-            print ("Downloading USE embeddings...")
-            r = requests.get(self.USE_link)
-            open("USE.tar.gz", "wb").write(r.content)
-            
-            tar = tarfile.open("USE.tar.gz", "r:gz")
-            tar.extractall(path=self.USE_folder)
-            tar.close()
-
-            os.remove("USE.tar.gz")
-            embed = hub.KerasLayer(self.USE_folder)
-            pass
-        word_embeddings = embed(words)
+        
+        word_embeddings = self.USE.embed(words)
         return word_embeddings.numpy()
 
     def generate_mappings(self):
