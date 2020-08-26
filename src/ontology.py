@@ -1,5 +1,6 @@
 import itertools
 from xml.dom import minidom
+from urllib.request import urlopen
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 
@@ -14,7 +15,10 @@ class Ontology():
             Parsed Ontology object
         '''
         self.ontology = ontology
-        self.ontology_obj = minidom.parse(ontology)
+        if ontology.startswith("https://"):
+            self.ontology_obj = minidom.parse(urlopen(ontology))
+        else:
+            self.ontology_obj = minidom.parse(ontology)
         self.root = self.ontology_obj.documentElement # root node
         
         self.construct_mapping_dict()
