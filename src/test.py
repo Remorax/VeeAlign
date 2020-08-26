@@ -15,9 +15,13 @@ ont_name1, ont_name2 = sys.argv[1], sys.argv[2]
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1]) + "/"
+
+print ("Prefix path: ", prefix_path)
+
 # Initialize variables from config
-model_path = str(config["Paths"]["model_path"])
-USE_folder = str(config["USE Embeddings"]["USE_folder"])
+model_path = prefix_path + str(config["Paths"]["model_path"])
+output_path = prefix_path + str(config["Paths"]["output_folder"])
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
 max_neighbours = int(config["Parameters"]["max_neighbours"])
@@ -28,7 +32,7 @@ batch_size = int(config["Hyperparameters"]["batch_size"])
 test_ontologies = [tuple([ont_name1, ont_name2])]
 
 # Preprocessing and parsing input data for testing
-preprocessing = DataParser(test_ontologies, USE_folder)
+preprocessing = DataParser(test_ontologies)
 test_data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts = preprocessing.process(spellcheck, max_neighbours)
 
 class SiameseNetwork(nn.Module):
@@ -92,7 +96,8 @@ def embed(inputs):
 def write_results():
     ont_name_parsed1 = "http://" + ont_name1.split("/")[-1].split(".")[0]
     ont_name_parsed2 = "http://" + ont_name2.split("/")[-1].split(".")[0]
-    rdf = """<?xml version='1.0' encoding='utf-8' standalone='no'?>
+    rdf = \
+    """<?xml version='1.0' encoding='utf-8' standalone='no'?>
     <rdf:RDF xmlns='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'
              xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
              xmlns:xsd='http://www.w3.org/2001/XMLSchema#'
@@ -187,4 +192,4 @@ final_list = [(elem[0], elem[1], str(round(all_results[elem][0], 3))) for elem i
 
 f = "VeeAlign-" + ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
 
-open(f, "w+").write(write_results())
+open(output_path + f, "w+").write(write_results())

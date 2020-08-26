@@ -10,9 +10,8 @@ def cos_sim(a,b):
 
 class DataParser():
     """Data parsing class"""
-    def __init__(self, ontologies_in_alignment, USE_folder, gt_mappings=None):
+    def __init__(self, ontologies_in_alignment, gt_mappings=None):
         self.ontologies_in_alignment = ontologies_in_alignment
-        self.USE_folder = USE_folder
         self.gt_mappings = gt_mappings
         self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
         self.USE = hub.load(self.USE_link)

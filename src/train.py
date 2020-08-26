@@ -22,12 +22,15 @@ def load_alignments(folder):
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-# Initialize variables from config
-alignment_folder = str(config["Paths"]["alignment_folder"])
-train_folder = str(config["Paths"]["train_folder"])
-model_path = str(config["Paths"]["model_path"])
+prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1])
 
-USE_folder = str(config["USE Embeddings"]["USE_folder"])
+print ("Prefix path: ", prefix_path)
+
+# Initialize variables from config
+alignment_folder = prefix_path + str(config["Paths"]["alignment_folder"])
+train_folder = prefix_path + str(config["Paths"]["train_folder"])
+model_path = prefix_path + str(config["Paths"]["model_path"])
+
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
 max_neighbours = int(config["Parameters"]["max_neighbours"])
