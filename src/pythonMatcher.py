@@ -98,8 +98,8 @@ def embed(inputs):
     return np.array([emb_vals[idx] for idx in inputs])
 
 def write_results():
-    ont_name_parsed1 = "http://" + ont_name1.split("/")[-1].split(".")[0]
-    ont_name_parsed2 = "http://" + ont_name2.split("/")[-1].split(".")[0]
+    ont_name_parsed1 = Ontology(ont_name1).extract_ns()
+    ont_name_parsed2 = Ontology(ont_name2).extract_ns()
     rdf = \
     """<?xml version='1.0' encoding='utf-8' standalone='no'?>
 <rdf:RDF xmlns='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'
@@ -129,7 +129,7 @@ def write_results():
       <relation>=</relation>
       <measure rdf:datatype='http://www.w3.org/2001/XMLSchema#float'>{}</measure>
     </Cell>
-  </map>""".format(ont_name_parsed1 + "#" + a.split("#")[-1], ont_name_parsed2 + "#" + b.split("#")[-1], score)
+  </map>""".format(ont_name_parsed1 + "#" + "#".join(a.split("#")[1:]), ont_name_parsed2 + "#" + "#".join(b.split("#")[1:]), score)
         rdf += mapping
     rdf += """
 </Alignment>
@@ -195,6 +195,6 @@ final_list = [(elem[0], elem[1], str(round(all_results[elem][0], 3))) for elem i
 
 f = "VeeAlign-" + ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
 
-open(output_path + f, "w+").write(write_results())
+# open(output_path + f, "w+").write(write_results())
 
 print("file://" + output_path + f)
