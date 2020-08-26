@@ -1,5 +1,5 @@
 from ontology import *
-import os, itertools, requests, re, subprocess, tarfile
+import os, itertools, re
 import tensorflow_hub as hub
 import numpy as np
 from scipy import spatial
