@@ -180,6 +180,9 @@ class Ontology():
     def filter_null(self, data):
         return [el for el in data if el]
     
+    def extract_ns(self):
+        return self.ontology_obj.getElementsByTagName("rdf:RDF")[0].getAttribute("xmlns")
+
     def extract_ID(self, element, check_coded = True):
         '''
         Returns ID for a parsed DOM element. In ontologies where classes are represented by 
@@ -190,9 +193,7 @@ class Ontology():
         if len(list(filter(str.isdigit, element_id))) >= 3 and "_" in element_id and check_coded:
             return self.mapping_dict[element_id]
         return element_id.replace("UNDEFINED_", "").replace("DO_", "")
-    
-    def flatten (self):
-        return 
+
     def parse_classes(self):
         '''
         Parse all entities, including domain and range entities in ontology

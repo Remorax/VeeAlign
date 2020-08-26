@@ -41,8 +41,8 @@ class DataParser():
 
             mappings = list(itertools.product(ent1, ent2)) + list(itertools.product(obj1, obj2)) + list(itertools.product(data1, data2))
 
-            all_mappings.extend([(l[0].split("/")[-1].split(".")[0] + "#" + el[0], 
-                                l[1].split("/")[-1].split(".")[0] + "#" + el[1]) for el in mappings])
+            all_mappings.extend([(ont1.extract_ns() + "#" + el[0], 
+                                ont2.extract_ns() + "#" + el[1]) for el in mappings])
 
         if self.gt_mappings:
             data = {mapping: False for mapping in all_mappings}
@@ -147,7 +147,7 @@ class DataParser():
             entities = ont.get_entities()
             props = ont.get_object_properties() + ont.get_data_properties()
             triples = list(set(flatten(ont.get_triples())))
-            ont_name_filt = ont_name.split("/")[-1].split(".")[0]
+            ont_name_filt = ont.extract_ns()
             extracted_elems.extend([ont_name_filt + "#" + elem for elem in entities + props + triples])
 
         extracted_elems = list(set(extracted_elems))
@@ -227,7 +227,7 @@ class DataParser():
         
         rootpath_dict = ont_obj.parents_dict
         rootpath_dict = {elem: self.path_to_root(elem, rootpath_dict) for elem in rootpath_dict}
-        ont = ont.split("/")[-1].split(".")[0]
+        ont = ont_obj.extract_ns()
 
         for entity in neighbours_dict:
             if entity in rootpath_dict and len(rootpath_dict[entity]) > 0:
@@ -240,7 +240,7 @@ class DataParser():
         return neighbours_dict
 
     def construct_neighbour_dicts(self, neighbours=None):
-        neighbours_dicts = {ont.split("/")[-1].split(".")[0]: self.get_one_hop_neighbours(ont) 
+        neighbours_dicts = {Ontology(ont).extract_ns(): self.get_one_hop_neighbours(ont) 
                             for ont in list(set(flatten(self.ontologies_in_alignment)))}
         if not neighbours:
             max_neighbours = np.max(flatten([[len(el[e]) for e in el] for el in neighbours_dicts.values()]))
