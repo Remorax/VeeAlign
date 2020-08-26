@@ -186,4 +186,4 @@ final_list = [(elem[0], elem[1], str(round(all_results[elem][0], 3))) for elem i
 
 f = "VeeAlign-" + ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
 
-open(f, "wb").write(write_results())
+open(f, "w+").write(write_results())
