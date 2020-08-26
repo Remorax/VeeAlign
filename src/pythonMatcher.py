@@ -100,6 +100,8 @@ def embed(inputs):
 def write_results():
     ont_name_parsed1 = Ontology(ont_name1).extract_ns()
     ont_name_parsed2 = Ontology(ont_name2).extract_ns()
+    ont_name1_pre = ont_name1 if (ont_name1.startswith("http://") or ont_name1.startswith("https://")) else "file://" + ont_name1
+    ont_name2_pre = ont_name2 if (ont_name2.startswith("http://") or ont_name2.startswith("https://")) else "file://" + ont_name2
     rdf = \
     """<?xml version='1.0' encoding='utf-8' standalone='no'?>
 <rdf:RDF xmlns='http://knowledgeweb.semanticweb.org/heterogeneity/alignment#'
@@ -119,7 +121,7 @@ def write_results():
     <Ontology rdf:about="{}">
       <location>{}</location>
     </Ontology>
-  </onto2>""".format(ont_name_parsed1, "file://" + ont_name1, ont_name_parsed2, "file://" + ont_name2)
+  </onto2>""".format(ont_name_parsed1.split("#")[0], ont_name1_pre, ont_name_parsed2.split("#")[0], ont_name2_pre)
     for (a,b,score) in final_list:
         mapping = """
   <map>
@@ -129,7 +131,7 @@ def write_results():
       <relation>=</relation>
       <measure rdf:datatype='http://www.w3.org/2001/XMLSchema#float'>{}</measure>
     </Cell>
-  </map>""".format(ont_name_parsed1 + "#" + "#".join(a.split("#")[1:]), ont_name_parsed2 + "#" + "#".join(b.split("#")[1:]), score)
+  </map>""".format(ont_name_parsed1 + "#".join(a.split("#")[1:]), ont_name_parsed2 + "#".join(b.split("#")[1:]), score)
         rdf += mapping
     rdf += """
 </Alignment>
