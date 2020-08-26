@@ -193,8 +193,11 @@ with torch.no_grad():
     
 final_list = [(elem[0], elem[1], str(round(all_results[elem][0], 3))) for elem in all_results if all_results[elem][1]]
 
-f = "VeeAlign-" + ont_name1.split("/")[-1].split(".")[0] + "-" + ont_name2.split("/")[-1].split(".")[0] + ".rdf"
+ont_name_parsed1 = Ontology(ont_name1).extract_ns().split("/")[-1].split("#")[0]
+ont_name_parsed2 = Ontology(ont_name2).extract_ns().split("/")[-1].split("#")[0]
 
-# open(output_path + f, "w+").write(write_results())
+f = "VeeAlign-" + ont_name_parsed1 + "-" + ont_name_parsed2 + ".rdf"
+
+open(output_path + f, "w+").write(write_results())
 
 print("file://" + output_path + f)
