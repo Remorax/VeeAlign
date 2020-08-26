@@ -15,7 +15,7 @@ class Ontology():
             Parsed Ontology object
         '''
         self.ontology = ontology
-        if ontology.startswith("https://"):
+        if ontology.startswith("https://") or ontology.startswith("http://"):
             self.ontology_obj = minidom.parse(urlopen(ontology))
         else:
             self.ontology_obj = minidom.parse(ontology)
