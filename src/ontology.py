@@ -63,39 +63,32 @@ class Ontology():
         '''
         return True if element.getAttribute(attribute).split("#")[-1] == value else False
     
-    def get_subclass_triples(self):
+    def get_subclass_triples(self, check_coded=False):
         '''
         Returns subclass triples
         '''
-        subclasses = self.get_subclasses()
-        # Creation of immediate parents dict
-        for (a,b,c) in subclasses:
-            if c == "subclass_of" and a!="Thing" and b!="Thing":
-                if b not in self.parents_dict:
-                    self.parents_dict[b] = [a]
-                else:
-                    self.parents_dict[b].append(a)
-        return [(b,a,c) for (a,b,c) in subclasses]
+        subclasses = self.get_subclasses(check_coded)
+        return [(b,a,c,d) for (a,b,c,d) in subclasses]
     
-    def parse_triples(self, union_flag=0, subclass_of=True, data_prop=True):
+    def parse_triples(self, union_flag=0, subclass_of=True, check_coded=False):
         '''
         Parses ontology to obtain object property, data property and subclass triples 
         Args:
             union_flag: 0, if classes containing union of n classes are to be denoted 
             as a single class or n separate classes, else 1
             subclass_of: Determines if subclass triples should be returned or not
-            data_prop: Determines if data property triples should be returned or not
+            check_coded: Determines if element should be queried for its label while extracting ID
         Returns:
-            list of triples of the form (a,b,c)
+            list of 4-tuples of the form (a,b,c,d) where d is the type of property c is.
         '''
-        obj_props = self.object_properties
+        obj_props = [(prop, "Object Property") for prop in self.object_properties]
         if data_prop:
-            data_props = self.data_properties
+            data_props = [(prop, "Datatype Property") for prop in self.data_properties]
             props = obj_props + data_props
         else:
             props = obj_props
         all_triples = []
-        for prop in props:
+        for prop, prop_type in props:
             domain_children = self.get_child_node(prop, "rdfs:domain")
             range_children = self.get_child_node(prop, "rdfs:range")
             domain_prop = self.filter_null([self.extract_ID(el) for el in domain_children])
@@ -109,24 +102,24 @@ class Ontology():
                 range_prop = self.filter_null([self.extract_ID(el) for el in range_children[0].getElementsByTagName("owl:Class")])
             if domain_prop and range_prop:
                 if union_flag == 0:
-                    all_triples.extend([(el[0], el[1], self.extract_ID(prop)) for el in list(itertools.product(domain_prop, range_prop))])
+                    all_triples.extend([(el[0], el[1], self.extract_ID(prop), prop_type) for el in list(itertools.product(domain_prop, range_prop))])
                 else:
-                    all_triples.append(("###".join(domain_prop), "###".join(range_prop), self.extract_ID(prop)))
+                    all_triples.append(("###".join(domain_prop), "###".join(range_prop), self.extract_ID(prop), prop_type))
         if subclass_of:
-            all_triples.extend(self.get_subclass_triples())
+            all_triples.extend(self.get_subclass_triples(check_coded))
         return list(set(all_triples))
     
-    def get_triples(self, union_flag=0, subclass_of=True):
+    def get_triples(self, union_flag=0, subclass_of=True, check_coded=False):
         '''
         Wrapper on top of parse_triples
         '''
-        return self.parse_triples(union_flag, subclass_of)
+        return self.parse_triples(union_flag, subclass_of, check_coded)
 
     def parse_subclasses(self):
         '''
         Parses ontology to obtain subclass triples
         Returns:
-            list of subclass triples of the form (a,b,c)
+            list of subclass triples of the form (a,b,c,d)
         '''
         subclasses = self.root.getElementsByTagName("rdfs:subClassOf")
         subclass_pairs = []
@@ -134,7 +127,7 @@ class Ontology():
             inline_subclasses = self.extract_ID(el)
             if inline_subclasses:
                 # Subclass of with inline IDs
-                subclass_pairs.append((el, el.parentNode, "subclass_of"))
+                subclass_pairs.append((el, el.parentNode, "subclass_of", "Subclass"))
             else:
                 level1_class = self.get_child_node(el, "owl:Class")
                 if not level1_class:
@@ -149,39 +142,61 @@ class Ontology():
                         continue
                     try:
                         if self.extract_ID(prop[0]) and self.extract_ID(some_vals[0]):
-                            subclass_pairs.append((el.parentNode, some_vals[0], self.extract_ID(prop[0])))
+                            subclass_pairs.append((el.parentNode, some_vals[0], self.extract_ID(prop[0]), "Object Property"))
                         elif self.extract_ID(prop[0]) and not self.extract_ID(some_vals[0]):
                             class_vals = self.get_child_node(some_vals[0], "owl:Class")
-                            subclass_pairs.append((el.parentNode, class_vals[0], self.extract_ID(prop[0])))
+                            subclass_pairs.append((el.parentNode, class_vals[0], self.extract_ID(prop[0]), "Object Property"))
                         elif not self.extract_ID(prop[0]) and self.extract_ID(some_vals[0]):
                             prop_vals = self.get_child_node(prop[0], "owl:ObjectProperty")
-                            subclass_pairs.append((el.parentNode, some_vals[0], self.extract_ID(prop_vals[0])))
+                            subclass_pairs.append((el.parentNode, some_vals[0], self.extract_ID(prop_vals[0]), "Object Property"))
                         else:
                             prop_vals = self.get_child_node(prop[0], "owl:ObjectProperty")
                             class_vals = self.get_child_node(some_vals[0], "owl:Class")
-                            subclass_pairs.append((el.parentNode, class_vals[0], self.extract_ID(prop_vals[0])))
+                            subclass_pairs.append((el.parentNode, class_vals[0], self.extract_ID(prop_vals[0]), "Object Property"))
                     except Exception as e:
-                        continue
+                        try:
+                            if not self.extract_ID(prop[0]) and self.extract_ID(some_vals[0]):
+                                prop_vals = self.get_child_node(prop[0], "owl:DatatypeProperty")
+                                subclass_pairs.append((el.parentNode, some_vals[0], self.extract_ID(prop_vals[0]), "Datatype Property"))
+                            elif not self.extract_ID(prop[0]) and not self.extract_ID(some_vals[0]):
+                                prop_vals = self.get_child_node(prop[0], "owl:DatatypeProperty")
+                                class_vals = self.get_child_node(some_vals[0], "owl:Class")
+                                subclass_pairs.append((el.parentNode, class_vals[0], self.extract_ID(prop_vals[0]), "Datatype Property"))
+                        except Exception as e:
+                            continue
                 else:
                     if self.extract_ID(level1_class[0]):
                         # Subclass label under a level 1 tag
-                        subclass_pairs.append((level1_class[0], el.parentNode, "subclass_of"))
+                        subclass_pairs.append((level1_class[0], el.parentNode, "subclass_of", "Subclass"))
                     else:
                         continue
         return subclass_pairs
         
-    def get_subclasses(self):
+    def get_subclasses(self, check_coded=False):
         '''
         Extracts entity ID from parsed subclass triples
         '''
-        subclasses = [(self.extract_ID(a), self.extract_ID(b), c) for (a,b,c) in self.subclasses]
+        subclasses = [(self.extract_ID(a, not check_coded), self.extract_ID(b, not check_coded), c, d) for (a,b,c,d) in self.subclasses]
+        self.parents_dict = {}
+        for (a,b,c,d) in subclasses:
+            if c == "subclass_of" and a!="Thing" and b!="Thing":
+                if b not in self.parents_dict:
+                    self.parents_dict[b] = [a]
+                else:
+                    self.parents_dict[b].append(a)
         return [el for el in subclasses if el[0] and el[1] and el[2] and el[0]!="Thing" and el[1]!="Thing"]
     
     def filter_null(self, data):
         return [el for el in data if el]
     
     def extract_ns(self):
-        return self.ontology_obj.getElementsByTagName("rdf:RDF")[0].getAttribute("xmlns")
+        '''
+        Extracts namespace of an ontology
+        '''
+        ns = self.ontology_obj.getElementsByTagName("rdf:RDF")[0].getAttribute("xmlns")
+        if ns[-1] == "#":
+            return ns
+        return self.ontology_obj.doctype.entities.item(0).firstChild.nodeValue
 
     def extract_ID(self, element, check_coded = True):
         '''
@@ -199,7 +214,7 @@ class Ontology():
         Parse all entities, including domain and range entities in ontology
         '''
         class_elems = [self.extract_ID(el) for el in self.root.getElementsByTagName("owl:Class")]
-        subclass_classes = list(set(flatten([el[:-1] for el in self.triples])))
+        subclass_classes = list(set(flatten([el[:-2] for el in self.triples])))
         return list(set(self.filter_null(class_elems + subclass_classes)))
     
     def get_classes(self):

@@ -3,6 +3,7 @@ import os, itertools, re, logging
 import tensorflow_hub as hub
 import numpy as np
 from scipy import spatial
+from copy import deepcopy
 
 # Returns cosine similarity of two vectors
 def cos_sim(a,b):
@@ -10,10 +11,14 @@ def cos_sim(a,b):
 
 class DataParser():
     """Data parsing class"""
-    def __init__(self, ontologies_in_alignment, gt_mappings=None):
+    def __init__(self, ontologies_in_alignment, language, gt_mappings=None):
         self.ontologies_in_alignment = ontologies_in_alignment
         self.gt_mappings = gt_mappings
-        self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
+        self.language = language
+        if self.language == "en":
+            self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
+        else:
+            self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-multilingual/3?tf-hub-format=compressed"
         self.USE = hub.load(self.USE_link)
         self.stopwords = ["has"]
     
@@ -41,27 +46,43 @@ class DataParser():
 
             mappings = list(itertools.product(ent1, ent2)) + list(itertools.product(obj1, obj2)) + list(itertools.product(data1, data2))
 
-            all_mappings.extend([(l[0].split("/")[-1].split(".")[0] + "#" + el[0], 
-                                l[1].split("/")[-1].split(".")[0] + "#" + el[1]) for el in mappings])
+            pre1 = l[0].split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
+            pre2 = l[1].split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
+
+            all_mappings.extend([(pre1 + "#" + el[0], pre2 + "#" + el[1]) for el in mappings])
 
         if self.gt_mappings:
+            s = set(all_mappings)
             data = {mapping: False for mapping in all_mappings}
             for mapping in set(self.gt_mappings):
-                data[mapping] = True
+                if mapping in s:
+                    data[mapping] = True
+                else:
+                    mapping = tuple([el.replace(",-", "_") for el in mapping])
+                    if mapping in s:
+                        data[mapping] = True
+                    else:
+                        print ("Warning: {} given in alignments could not be found in source/target ontology." mapping)
+                        continue
             return data
         return all_mappings
 
-    def path_to_root(self, element, parents_dict):
+    def path_to_root(elem, ont_mappings, curr = [], rootpath=[]):
         # Extracts the path to the root recursively, 
         # i.e. all the "ancestral" nodes that lie from current node to root node
-        if element not in parents_dict or not parents_dict[element]:
-            return []
-        output = flatten([[e] + self.path_to_root(e, parents_dict) for e in parents_dict[element]])
-        return output
+        curr.append(elem)
+        if elem not in ont_mappings or not ont_mappings[elem]:
+            rootpath.append(curr)
+            return
+        for node in ont_mappings[elem]:
+            curr_orig = deepcopy(curr)
+            _ = path_to_root(node, ont_mappings, curr, rootpath)
+            curr = curr_orig
+        return rootpath
 
     def construct_abbreviation_resolution_dict(self, all_mappings):
         # Constructs an abbrevation resolution dict
-        logging.info ("Constructing abbrevation resolution dict....")
+        print ("Constructing abbrevation resolution dict....")
         abbreviations_dict = {}
         final_dict = {}
 
@@ -110,6 +131,7 @@ class DataParser():
 
         resolved_dict = {key: scored_dict[key][0] for key in scored_dict}
         filtered_dict = {key: " ".join(resolved_dict[key][0].split("_")) for key in resolved_dict if resolved_dict[key][-1] > 0.9}
+        print ("Results after abbreviation resolution: ", filtered_dict)
         return filtered_dict
 
     def camel_case_split(self, identifier):
@@ -122,7 +144,7 @@ class DataParser():
 
     def run_abbreviation_resolution(self, inp, filtered_dict):
         # Resolving abbreviations to full forms
-        logging.info ("Resolving abbreviations...")
+        print ("Resolving abbreviations...")
         inp_resolved = []
         for concept in inp:
             for key in filtered_dict:
@@ -141,18 +163,25 @@ class DataParser():
     def extract_keys(self):
         # Extracts all entities for which USE embeddings needs to be extracted
         extracted_elems = []
+        mapping_ont = {}
 
         for ont_name in list(set(flatten(self.ontologies_in_alignment))):
             ont = Ontology(ont_name)
             entities = ont.get_entities()
             props = ont.get_object_properties() + ont.get_data_properties()
-            triples = list(set(flatten(ont.get_triples())))
-            ont_name_filt = ont_name.split("/")[-1].split(".")[0]
+            triples = list(set(flatten([(a,b,c) for (a,b,c,d) in ont.get_triples()])))
+            ont_name_filt = ont_name.split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
+            mapping_ont[ont_name] = ont
             extracted_elems.extend([ont_name_filt + "#" + elem for elem in entities + props + triples])
 
         extracted_elems = list(set(extracted_elems))
-        inp = [" ".join(self.parse(word.split("#")[1])) for word in extracted_elems]
-        logging.info ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
+        inp = []
+        for word in extracted_elems:
+            ont_name = word.split("#")[0]
+            elem = word.split("#")[1]
+            inp.append(self.parse(mapping_ont[ont_name].mapping_dict.get(elem, elem)))
+
+        print ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
 
         extracted_elems = ["<UNK>"] + extracted_elems
 
@@ -161,7 +190,7 @@ class DataParser():
 
     def run_spellcheck(self, inp):
         # Spelling checker and corrector
-        logging.info ("Running spellcheck...")
+        print ("Running spellcheck...")
         url = "https://montanaflynn-spellcheck.p.rapidapi.com/check/"
 
         headers = {
@@ -187,7 +216,7 @@ class DataParser():
                         resolved = resolved.replace(word.lower(), response["corrections"][word][0].lower())
                         
                 
-                logging.info ("Corrected {} to {}".format(concept, resolved))
+                print ("Corrected {} to {}".format(concept, resolved))
                 inp_spellchecked.append(resolved)
             else:
                 inp_spellchecked.append(concept)
@@ -216,51 +245,71 @@ class DataParser():
 
         return emb_vals, emb_indexer, emb_indexer_inv
 
-    def get_one_hop_neighbours(self, ont):
+    def get_one_hop_neighbours(self, ont, bag_of_neighbours=False):
         ont_obj = Ontology(ont)
         triples = ont_obj.get_triples()
-        entities = [(a,b) for (a,b,c) in triples]
-        neighbours_dict = {elem: [elem] for elem in list(set(flatten(entities)))}
-        for e1, e2 in entities:
-            neighbours_dict[e1].append(e2)
-            neighbours_dict[e2].append(e1)
+        entities = [(a,b) for (a,b,c,d) in triples]
+        neighbours_dict = {elem: [[] for i in range(4)] for elem in list(set(flatten(entities)))}
+        for (e1, e2, p, d) in triples:
+            if e1==e2:
+                continue
+            if bag_of_neighbours:
+                e1_path = e1
+                e2_path = e2
+            else:
+                e1_path = [e1]
+                e2_path = [e2]
+            if d == "Object Property":
+                neighbours_dict[e1][2].append(e2_path)
+                neighbours_dict[e2][2].append(e1_path)
+            elif d == "Datatype Property":
+                neighbours_dict[e1][3].append(e2_path)
+                neighbours_dict[e2][3].append(e1_path)
+            elif d == "Subclass":
+                neighbours_dict[e2][1].append(e1_path)
+            else:
+                print ("Error wrong value of d: ", d)
         
         rootpath_dict = ont_obj.parents_dict
-        rootpath_dict = {elem: self.path_to_root(elem, rootpath_dict) for elem in rootpath_dict}
+        rootpath_dict_new = {}
+        for elem in rootpath_dict:
+            rootpath_dict_new[elem] = path_to_root(elem, rootpath_dict, [], [])
         ont = ont.split("/")[-1].split(".")[0]
 
         for entity in neighbours_dict:
-            if entity in rootpath_dict and len(rootpath_dict[entity]) > 0:
-                neighbours_dict[entity].extend(rootpath_dict[entity])
+            if bag_of_neighbours:
+                neighbours_dict[entity][1] = [neighbours_dict[entity][1]]
+                neighbours_dict[entity][2] = [neighbours_dict[entity][2]]
+                neighbours_dict[entity][3] = [neighbours_dict[entity][3]]
+            if entity in rootpath_dict_new and len(rootpath_dict_new[entity]) > 0:
+                neighbours_dict[entity][0].extend(rootpath_dict_new[entity])
             else:
                 continue
-        neighbours_dict = {el: neighbours_dict[el][:1] + sorted(list(set(neighbours_dict[el][1:])))
-                           for el in neighbours_dict}
-        neighbours_dict = {ont + "#" + el: [ont + "#" + e for e in neighbours_dict[el]] for el in neighbours_dict}
+
+        neighbours_dict = {ont + "#" + el: [[tuple([ont + "#" + node for node in path]) for path in nbr_type]
+                                        for nbr_type in neighbours_dict[el]] 
+                       for el in neighbours_dict}
+        neighbours_dict = {el: [[list(path) for path in nbr_type] for nbr_type in neighbours_dict[el]]
+                       for el in neighbours_dict}
         return neighbours_dict
 
-    def construct_neighbour_dicts(self, neighbours=None):
-        neighbours_dicts = {ont.split("/")[-1].split(".")[0]: self.get_one_hop_neighbours(ont) 
-                            for ont in list(set(flatten(self.ontologies_in_alignment)))}
-        if not neighbours:
-            max_neighbours = np.max(flatten([[len(el[e]) for e in el] for el in neighbours_dicts.values()]))
-        else:
-            max_neighbours = neighbours
-        neighbours_lens = {ont: {key: len(neighbours_dicts[ont][key]) for key in neighbours_dicts[ont]}
-                           for ont in neighbours_dicts}
-        neighbours_dicts = {ont: {key: neighbours_dicts[ont][key] + ["<UNK>" for i in range(max_neighbours -len(neighbours_dicts[ont][key]))]
-                      for key in neighbours_dicts[ont]} for ont in neighbours_dicts}
-        return neighbours_dicts
+    def construct_neighbour_dicts(self, bag_of_neighbours=False):
+        neighbours_dicts = {}
+        for ont in list(set(flatten(self.ontologies_in_alignment))):
+            neighbours_dicts = {**neighbours_dicts, **self.get_one_hop_neighbours(ont, bag_of_neighbours)}
+        max_types = np.max([len([nbr_type for nbr_type in elem if flatten(nbr_type)]) for elem in neighbours_dicts.values()])
+        return neighbours_dicts, max_types
 
-    def process(self, spellcheck=False, neighbours=None):
+    def process(self, spellcheck=False, bag_of_neighbours=False):
         all_mappings = self.generate_mappings()
         inp, extracted_elems = self.extract_keys()
-        filtered_dict = self.construct_abbreviation_resolution_dict(all_mappings)
-        inp_resolved = self.run_abbreviation_resolution(inp, filtered_dict)
-        if spellcheck:
-            inp_resolved = self.run_spellcheck(inp_resolved)
-        inp_filtered = self.remove_stopwords(inp_resolved)
-        emb_vals, emb_indexer, emb_indexer_inv = self.extract_embeddings(inp_filtered, extracted_elems)
-        neighbours_dicts = self.construct_neighbour_dicts(neighbours)
+        if self.language=="en":
+            filtered_dict = self.construct_abbreviation_resolution_dict(all_mappings)
+            inp_resolved = self.run_abbreviation_resolution(inp, filtered_dict)
+            if spellcheck:
+                inp_resolved = self.run_spellcheck(inp_resolved)
+            inp = self.remove_stopwords(inp_resolved)
+        emb_vals, emb_indexer, emb_indexer_inv = self.extract_embeddings(inp, extracted_elems)
+        neighbours_dicts, max_types = self.construct_neighbour_dicts(bag_of_neighbours)
 
-        return all_mappings, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts
+        return all_mappings, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts, max_types
