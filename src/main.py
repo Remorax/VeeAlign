@@ -44,15 +44,15 @@ model_path = prefix_path + str(config["Paths"]["model_path"])
 
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
-# max_paths = int(config["Parameters"]["max_paths"])
-# max_pathlen = int(config["Parameters"]["max_pathlen"])
-max_paths = int(sys.argv[2])
-max_pathlen = int(sys.argv[1])
+max_paths = int(config["Parameters"]["max_paths"])
+max_pathlen = int(config["Parameters"]["max_pathlen"])
+# max_paths = int(sys.argv[2])
+# max_pathlen = int(sys.argv[1])
 threshold = float(config["Parameters"]["threshold"])
-# bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
-# weighted_average = config["Parameters"]["weighted_average"] == "True"
-bag_of_neighbours = sys.argv[3] == "True"
-weighted_average = sys.argv[4] == "True"
+bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
+weighted_average = config["Parameters"]["weighted_average"] == "True"
+# bag_of_neighbours = sys.argv[3] == "True"
+# weighted_average = sys.argv[4] == "True"
 
 lr = float(config["Hyperparameters"]["lr"])
 num_epochs = int(config["Hyperparameters"]["num_epochs"])
