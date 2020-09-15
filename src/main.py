@@ -27,7 +27,7 @@ def load_alignments(folder):
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1])
+prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1]) + "/"
 
 print ("Prefix path: ", prefix_path)
 

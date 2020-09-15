@@ -62,7 +62,7 @@ class DataParser():
                     if mapping in s:
                         data[mapping] = True
                     else:
-                        print ("Warning: {} given in alignments could not be found in source/target ontology." mapping)
+                        print ("Warning: {} given in alignments could not be found in source/target ontology.".format(mapping))
                         continue
             return data
         return all_mappings

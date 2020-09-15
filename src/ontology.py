@@ -82,11 +82,8 @@ class Ontology():
             list of 4-tuples of the form (a,b,c,d) where d is the type of property c is.
         '''
         obj_props = [(prop, "Object Property") for prop in self.object_properties]
-        if data_prop:
-            data_props = [(prop, "Datatype Property") for prop in self.data_properties]
-            props = obj_props + data_props
-        else:
-            props = obj_props
+        data_props = [(prop, "Datatype Property") for prop in self.data_properties]
+        props = obj_props + data_props
         all_triples = []
         for prop, prop_type in props:
             domain_children = self.get_child_node(prop, "rdfs:domain")
