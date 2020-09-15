@@ -1,4 +1,4 @@
-import configparser, logging, random
+import configparser, logging, random, sys
 import numpy as np
 from collections import OrderedDict
 from math import ceil
@@ -44,11 +44,15 @@ model_path = prefix_path + str(config["Paths"]["model_path"])
 
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
-max_paths = int(config["Parameters"]["max_paths"])
-max_pathlen = int(config["Parameters"]["max_pathlen"])
+# max_paths = int(config["Parameters"]["max_paths"])
+# max_pathlen = int(config["Parameters"]["max_pathlen"])
+max_paths = int(sys.argv[2])
+max_pathlen = int(sys.argv[1])
 threshold = float(config["Parameters"]["threshold"])
-bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
-weighted_average = config["Parameters"]["weighted_average"] == "True"
+# bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
+# weighted_average = config["Parameters"]["weighted_average"] == "True"
+bag_of_neighbours = sys.argv[3] == "True"
+weighted_average = sys.argv[4] == "True"
 
 lr = float(config["Hyperparameters"]["lr"])
 num_epochs = int(config["Hyperparameters"]["num_epochs"])
@@ -432,7 +436,7 @@ for index in data_iter:
         val_data = {elem: data[elem] for elem in data if tuple([el.split("#")[0] for el in elem]) in val_onto}
         test_data = {elem: data[elem] for elem in data if tuple([el.split("#")[0] for el in elem]) in test_onto}
         print ("Val onto: ", val_onto, "test_onto: ", test_onto)
-        print (list(data_items)[:100])
+
         train_data_t = [key for key in train_data if train_data[key]]
         train_data_f = [key for key in train_data if not train_data[key]]
 
@@ -480,7 +484,7 @@ for index in data_iter:
 
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    for epoch in range(1):
+    for epoch in range(num_epochs):
         inputs_pos, nodes_pos, targets_pos = generate_input(train_data_t, 1)
         inputs_neg, nodes_neg, targets_neg = generate_input(train_data_f, 0)
         inputs_all = list(inputs_pos) + list(inputs_neg)
@@ -489,7 +493,7 @@ for index in data_iter:
         
         all_inp = list(zip(inputs_all, targets_all, nodes_all))
         all_inp_shuffled = random.sample(all_inp, len(all_inp))
-        inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled[:10]))
+        inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled))
 
         batch_size = min(batch_size, len(inputs_all))
         num_batches = int(ceil(len(inputs_all)/batch_size))

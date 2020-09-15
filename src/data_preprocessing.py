@@ -1,5 +1,5 @@
 from ontology import *
-import os, itertools, re, logging, requests
+import os, itertools, re, logging, requests, urllib
 import tensorflow_hub as hub
 import numpy as np
 from scipy import spatial
@@ -191,33 +191,29 @@ class DataParser():
     def run_spellcheck(self, inp):
         # Spelling checker and corrector
         print ("Running spellcheck...")
-        url = "https://montanaflynn-spellcheck.p.rapidapi.com/check/"
+
+        url = "https://grammarbot.p.rapidapi.com/check"
 
         headers = {
-            'x-rapidapi-host': "montanaflynn-spellcheck.p.rapidapi.com",
-            'x-rapidapi-key': "9965b01207msh06291e57d6f2c55p1a6a16jsn0fb016da4a62"
+            'x-rapidapi-host': "grammarbot.p.rapidapi.com",
+            'x-rapidapi-key': "9965b01207msh06291e57d6f2c55p1a6a16jsn0fb016da4a62",
+            'content-type': "application/x-www-form-urlencoded"
             }
 
         inp_spellchecked = []
-        for concept in inp:
-            querystring = {"text": concept}
-            response = requests.request("GET", url, headers=headers, params=querystring).json()
-            if response["suggestion"] != concept:
-                resolved = str(concept)
-                final_list = []
-                for word in concept.split(" "):
-                    if not re.search("[A-Z][A-Z]+", concept):
-                        final_list.append(word.lower())
-                    else:
-                        final_list.append(word)
-                resolved = " ".join(final_list)
-                for word in response["corrections"]:
-                    if not re.search("[A-Z][A-Z]+", concept):
-                        resolved = resolved.replace(word.lower(), response["corrections"][word][0].lower())
-                        
-                
-                print ("Corrected {} to {}".format(concept, resolved))
-                inp_spellchecked.append(resolved)
+
+        for concept in inp_resolved:
+            payload = "language=en-US&text=" + urllib.parse.quote_plus(concept)
+            response = requests.request("POST", url, data=payload, headers=headers).json()
+            concept_corrected = str(concept)
+            
+            for elem in response["matches"]:
+                start, end = elem["offset"], elem["offset"] + elem["length"]
+                concept_corrected = concept_corrected[:start] + elem["replacements"][0]["value"] + concept_corrected[end:]
+            
+            if concept.lower() != concept_corrected.lower():
+                print ("{} corrected to {}".format(concept, concept_corrected))
+                inp_spellchecked.append(concept_corrected)
             else:
                 inp_spellchecked.append(concept)
 
@@ -307,7 +303,10 @@ class DataParser():
             filtered_dict = self.construct_abbreviation_resolution_dict(all_mappings)
             inp_resolved = self.run_abbreviation_resolution(inp, filtered_dict)
             if spellcheck:
-                inp_resolved = self.run_spellcheck(inp_resolved)
+                try:
+                    inp_resolved = self.run_spellcheck(inp_resolved)
+                except:
+                    continue
             inp = self.remove_stopwords(inp_resolved)
         emb_vals, emb_indexer, emb_indexer_inv = self.extract_embeddings(inp, extracted_elems)
         neighbours_dicts, max_types = self.construct_neighbour_dicts(bag_of_neighbours)
