@@ -306,7 +306,7 @@ class DataParser():
                 try:
                     inp_resolved = self.run_spellcheck(inp_resolved)
                 except:
-                    continue
+                    pass
             inp = self.remove_stopwords(inp_resolved)
         emb_vals, emb_indexer, emb_indexer_inv = self.extract_embeddings(inp, extracted_elems)
         neighbours_dicts, max_types = self.construct_neighbour_dicts(bag_of_neighbours)
