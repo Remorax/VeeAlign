@@ -1,5 +1,5 @@
 from ontology import *
-import os, itertools, re, logging
+import os, itertools, re, logging, requests
 import tensorflow_hub as hub
 import numpy as np
 from scipy import spatial
@@ -67,7 +67,7 @@ class DataParser():
             return data
         return all_mappings
 
-    def path_to_root(elem, ont_mappings, curr = [], rootpath=[]):
+    def path_to_root(self, elem, ont_mappings, curr = [], rootpath=[]):
         # Extracts the path to the root recursively, 
         # i.e. all the "ancestral" nodes that lie from current node to root node
         curr.append(elem)
@@ -76,7 +76,7 @@ class DataParser():
             return
         for node in ont_mappings[elem]:
             curr_orig = deepcopy(curr)
-            _ = path_to_root(node, ont_mappings, curr, rootpath)
+            _ = self.path_to_root(node, ont_mappings, curr, rootpath)
             curr = curr_orig
         return rootpath
 
@@ -140,7 +140,7 @@ class DataParser():
         return [m.group(0) for m in matches]
 
     def parse(self, word):
-        return flatten([el.split("_") for el in self.camel_case_split(word)])
+        return " ".join(flatten([el.split("_") for el in self.camel_case_split(word)]))
 
     def run_abbreviation_resolution(self, inp, filtered_dict):
         # Resolving abbreviations to full forms
@@ -171,7 +171,7 @@ class DataParser():
             props = ont.get_object_properties() + ont.get_data_properties()
             triples = list(set(flatten([(a,b,c) for (a,b,c,d) in ont.get_triples()])))
             ont_name_filt = ont_name.split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
-            mapping_ont[ont_name] = ont
+            mapping_ont[ont_name_filt] = ont
             extracted_elems.extend([ont_name_filt + "#" + elem for elem in entities + props + triples])
 
         extracted_elems = list(set(extracted_elems))
@@ -273,8 +273,8 @@ class DataParser():
         rootpath_dict = ont_obj.parents_dict
         rootpath_dict_new = {}
         for elem in rootpath_dict:
-            rootpath_dict_new[elem] = path_to_root(elem, rootpath_dict, [], [])
-        ont = ont.split("/")[-1].split(".")[0]
+            rootpath_dict_new[elem] = self.path_to_root(elem, rootpath_dict, [], [])
+        ont = ont.split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
 
         for entity in neighbours_dict:
             if bag_of_neighbours:

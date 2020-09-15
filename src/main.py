@@ -1,4 +1,4 @@
-import configparser, logging
+import configparser, logging, random
 import numpy as np
 from collections import OrderedDict
 from math import ceil
@@ -57,7 +57,7 @@ batch_size = int(config["Hyperparameters"]["batch_size"])
 
 reference_alignments = load_alignments(alignment_folder)
 gt_mappings = [tuple([elem.split("/")[-1] for elem in el]) for el in reference_alignments]
-gt_mappings = [el.split("#")[0].lower() +  "#" +  el.split("#")[1] for el in gt_mappings]
+gt_mappings = [tuple([el.split("#")[0].lower() +  "#" +  el.split("#")[1] for el in tup]) for tup in gt_mappings]
 print ("Ontologies being aligned are: ", ontologies_in_alignment)
 
 # Preprocessing and parsing input data for training
@@ -65,6 +65,7 @@ preprocessing = DataParser(ontologies_in_alignment, language, gt_mappings)
 data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
 all_fn, all_fp = [], []
+final_results = []
 direct_inputs, direct_targets = [], []
 threshold_results = {}
 
@@ -72,7 +73,7 @@ def test():
     '''
     Function to obtain output of model on test set
     '''
-    global test_data_t, test_data_f, direct_inputs, direct_targets
+    global index, test_data_t, test_data_f, direct_inputs, direct_targets, batch_size
     all_results = OrderedDict()    
     direct_inputs, direct_targets = [], []
     with torch.no_grad():
@@ -88,6 +89,7 @@ def test():
         targets_all = list(targets_pos) + list(targets_neg)
         nodes_all = list(nodes_pos) + list(nodes_neg)
         
+        print ("Inputs len", len(inputs_all), len(test_data_t), len(test_data_f)) 
         all_inp = list(zip(inputs_all, targets_all, nodes_all))
         all_inp_shuffled = random.sample(all_inp, len(all_inp))
         inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled))
@@ -101,7 +103,7 @@ def test():
             inputs = np.array(to_feature(inputs_all[batch_start: batch_end]))
             targets = np.array(targets_all[batch_start: batch_end])
             nodes = np.array(nodes_all[batch_start: batch_end])
-            
+ 
             inp_elems = torch.LongTensor(inputs).to(device)
             node_elems = torch.LongTensor(nodes).to(device)
             targ_elems = torch.DoubleTensor(targets)
@@ -116,7 +118,7 @@ def test():
                 if (ent1, ent2) in all_results:
                     print ("Error: ", ent1, ent2, "already present")
                 all_results[(ent1, ent2)] = (round(pred_elem, 3), targets[idx])
-        
+ 
         direct_targets = [True if el else False for el in direct_targets]
         
         print ("Len (direct inputs): ", len(direct_inputs))
@@ -125,7 +127,7 @@ def test():
             ent2 = emb_indexer_inv[direct_input[1]]
             sim = cos_sim(emb_vals[direct_input[0]], emb_vals[direct_input[1]])
             all_results[(ent1, ent2)] = (round(sim, 3), direct_targets[idx])
-    return (test_data_t, all_results)
+    return (index, test_data_t, all_results)
 
 def optimize_threshold():
     '''
@@ -134,7 +136,7 @@ def optimize_threshold():
     range of thresholds, dictated by the range of scores output by the model, with step size 
     0.001 and updates `threshold_results` which is the relevant dictionary.
     '''
-    global val_data_t, val_data_f, threshold_results
+    global val_data_t, val_data_f, threshold_results, batch_size, direct_inputs, direct_targets
     all_results = OrderedDict()
     direct_inputs, direct_targets = [], []
     with torch.no_grad():
@@ -226,9 +228,8 @@ def optimize_threshold():
             threshold += step
         
 def calculate_performance():
-    global index
     all_metrics, all_fn, all_fp = [], [], []
-    for (test_data_t, all_results) in final_results:
+    for (index, test_data_t, all_results) in final_results:
         res = []
         for i,key in enumerate(all_results):
             if all_results[key][0] > threshold:
@@ -249,7 +250,7 @@ def calculate_performance():
             print (e)
             continue
         if ontology_split:
-            print ("Performance for ", test_onto, "is :", (precision, recall, f1score, f2score, f0_5score))
+            print ("Performance for ", ontologies_in_alignment[index+2: index+3], "is :", (precision, recall, f1score, f2score, f0_5score))
         else:
             print ("Performance for ", index, "th fold is :", (precision, recall, f1score, f2score, f0_5score))
         all_fn.extend(fn_list)
@@ -313,7 +314,7 @@ class SiameseNetwork(nn.Module):
             
             if weighted_average:
                 # Calculate unified path representation as a weighted sum of all paths.
-                path_weights = masked_softmax(path_weights)
+                path_weights = self.masked_softmax(path_weights)
                 feature_emb_reshaped = feature_emb.reshape(-1, self.max_paths, self.max_pathlen * self.embedding_dim)
                 best_path = torch.bmm(path_weights.reshape(-1, 1, self.max_paths), feature_emb_reshaped)
                 best_path = best_path.squeeze(1).reshape(-1, self.n_neighbours, self.max_pathlen, self.embedding_dim)
@@ -327,7 +328,7 @@ class SiameseNetwork(nn.Module):
 
             best_path_reshaped = best_path.permute(0,3,1,2).reshape(-1, self.embedding_dim, self.n_neighbours * self.max_pathlen)
             node_weights = torch.bmm(node_emb.unsqueeze(1), best_path_reshaped) # dim: (batch_size, 4, max_pathlen)
-            node_weights = masked_softmax(node_weights.squeeze(1).reshape(-1, self.n_neighbours, self.max_pathlen)) # dim: (batch_size, 4, max_pathlen)
+            node_weights = self.masked_softmax(node_weights.squeeze(1).reshape(-1, self.n_neighbours, self.max_pathlen)) # dim: (batch_size, 4, max_pathlen)
             attended_path = node_weights.unsqueeze(-1) * best_path # dim: (batch_size, 4, max_pathlen, 512)
 
             distance_weighted_path = torch.sum((self.v[None,None,:,None] * attended_path), dim=2) # batch_size * 4 * 512
@@ -402,6 +403,7 @@ torch.set_default_dtype(torch.float64)
 
 torch.manual_seed(0)
 np.random.seed(0)
+random.seed(0)
 
 data_items = data.items()
 np.random.shuffle(list(data_items))
@@ -414,6 +416,7 @@ if ontology_split:
     data_iter = list(range(0, len(ontologies_in_alignment), step))
 else:
     data_iter = list(range(K))
+ontologies_in_alignment = [tuple([elem.split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower() for elem in pair]) for pair in ontologies_in_alignment]
 
 for index in data_iter:
     print ("Starting sliding window evaluation...")
@@ -428,7 +431,8 @@ for index in data_iter:
         test_onto = test_onto[(step-1):]
         val_data = {elem: data[elem] for elem in data if tuple([el.split("#")[0] for el in elem]) in val_onto}
         test_data = {elem: data[elem] for elem in data if tuple([el.split("#")[0] for el in elem]) in test_onto}
-
+        print ("Val onto: ", val_onto, "test_onto: ", test_onto)
+        print (list(data_items)[:100])
         train_data_t = [key for key in train_data if train_data[key]]
         train_data_f = [key for key in train_data if not train_data[key]]
 
@@ -476,7 +480,7 @@ for index in data_iter:
 
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    for epoch in range(num_epochs):
+    for epoch in range(1):
         inputs_pos, nodes_pos, targets_pos = generate_input(train_data_t, 1)
         inputs_neg, nodes_neg, targets_neg = generate_input(train_data_f, 0)
         inputs_all = list(inputs_pos) + list(inputs_neg)
@@ -485,7 +489,7 @@ for index in data_iter:
         
         all_inp = list(zip(inputs_all, targets_all, nodes_all))
         all_inp_shuffled = random.sample(all_inp, len(all_inp))
-        inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled))
+        inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled[:10]))
 
         batch_size = min(batch_size, len(inputs_all))
         num_batches = int(ceil(len(inputs_all)/batch_size))
