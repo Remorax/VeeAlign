@@ -57,6 +57,7 @@ batch_size = int(config["Hyperparameters"]["batch_size"])
 
 reference_alignments = load_alignments(alignment_folder)
 gt_mappings = [tuple([elem.split("/")[-1] for elem in el]) for el in reference_alignments]
+gt_mappings = [el.split("#")[0].lower() +  "#" +  el.split("#")[1] for el in gt_mappings]
 print ("Ontologies being aligned are: ", ontologies_in_alignment)
 
 # Preprocessing and parsing input data for training
