@@ -1,5 +1,6 @@
 from ontology import *
 import os, itertools, re, logging, requests, urllib
+import tensorflow_text
 import tensorflow_hub as hub
 import numpy as np
 from scipy import spatial
@@ -46,9 +47,8 @@ class DataParser():
 
             mappings = list(itertools.product(ent1, ent2)) + list(itertools.product(obj1, obj2)) + list(itertools.product(data1, data2))
 
-            pre1 = l[0].split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
-            pre2 = l[1].split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
-
+            pre1 = l[0].split("/")[-1].rsplit(".",1)[0]
+            pre2 = l[1].split("/")[-1].rsplit(".",1)[0]
             all_mappings.extend([(pre1 + "#" + el[0], pre2 + "#" + el[1]) for el in mappings])
 
         if self.gt_mappings:
@@ -170,7 +170,7 @@ class DataParser():
             entities = ont.get_entities()
             props = ont.get_object_properties() + ont.get_data_properties()
             triples = list(set(flatten([(a,b,c) for (a,b,c,d) in ont.get_triples()])))
-            ont_name_filt = ont_name.split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
+            ont_name_filt = ont_name.split("/")[-1].rsplit(".",1)[0]
             mapping_ont[ont_name_filt] = ont
             extracted_elems.extend([ont_name_filt + "#" + elem for elem in entities + props + triples])
 
@@ -270,7 +270,7 @@ class DataParser():
         rootpath_dict_new = {}
         for elem in rootpath_dict:
             rootpath_dict_new[elem] = self.path_to_root(elem, rootpath_dict, [], [])
-        ont = ont.split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower()
+        ont = ont.split("/")[-1].rsplit(".",1)[0]
 
         for entity in neighbours_dict:
             if bag_of_neighbours:
