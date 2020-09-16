@@ -1,5 +1,6 @@
 from ontology import *
 import os, itertools, re, logging, requests, urllib
+import tensorflow_text
 import tensorflow_hub as hub
 import numpy as np
 from scipy import spatial
@@ -16,9 +17,9 @@ class DataParser():
         self.gt_mappings = gt_mappings
         self.language = language
         if self.language == "en":
-            self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
+            self.USE_link = "/dccstor/cogfin/arvind/da/tf_use/use_o/"
         else:
-            self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-multilingual/3?tf-hub-format=compressed"
+            self.USE_link = "/dccstor/cogfin/arvind/da/tf_use/use_m/"
         self.USE = hub.load(self.USE_link)
         self.stopwords = ["has"]
     
