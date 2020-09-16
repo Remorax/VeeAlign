@@ -234,7 +234,13 @@ torch.set_default_dtype(torch.float64)
 print ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = SiameseNetwork(emb_vals).to(device)
-model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
+
+pretrained_dict = torch.load(model_path, map_location=torch.device(device))
+model_dict = model.state_dict()
+
+pretrained_dict = {k: v for k, v in pretrained_dict.items() if k!="name_embedding.weight"}
+model_dict.update(pretrained_dict)
+model.load_state_dict(model_dict)
 
 threshold = model.threshold.data.cpu().numpy()[0]
 
