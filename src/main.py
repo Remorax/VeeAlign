@@ -17,8 +17,8 @@ def load_alignments(folder):
     for f in os.listdir(folder):
         doc = minidom.parse(folder + f)
         ls = list(zip(doc.getElementsByTagName('entity1'), doc.getElementsByTagName('entity2')))
-        src = train_folder + doc.getElementsByTagName('Ontology')[0].getAttribute("rdf:about").split("/")[-1].split(".")[0] + ".owl"
-        targ = train_folder + doc.getElementsByTagName('Ontology')[1].getAttribute("rdf:about").split("/")[-1].split(".")[0] + ".owl"
+        src = train_folder + doc.getElementsByTagName('Ontology')[0].getAttribute("rdf:about").split("/")[-1].rsplit(".", 1)[0] + ".owl"
+        targ = train_folder + doc.getElementsByTagName('Ontology')[1].getAttribute("rdf:about").split("/")[-1].rsplit(".", 1)[0] + ".owl"
         ontologies_in_alignment.append((src, targ))
         alignments.extend([(a.getAttribute('rdf:resource'), b.getAttribute('rdf:resource')) for (a,b) in ls])
     return alignments
@@ -61,7 +61,7 @@ batch_size = int(config["Hyperparameters"]["batch_size"])
 
 reference_alignments = load_alignments(alignment_folder)
 gt_mappings = [tuple([elem.split("/")[-1] for elem in el]) for el in reference_alignments]
-gt_mappings = [tuple([el.split("#")[0].lower() +  "#" +  el.split("#")[1] for el in tup]) for tup in gt_mappings]
+gt_mappings = [tuple([el.split("#")[0].rsplit(".", 1)[0] +  "#" +  el.split("#")[1] for el in tup]) for tup in gt_mappings]
 print ("Ontologies being aligned are: ", ontologies_in_alignment)
 
 # Preprocessing and parsing input data for training
@@ -206,7 +206,8 @@ def optimize_threshold():
             for i,key in enumerate(all_results):
                 if all_results[key][0] > threshold:
                     res.append(key)
-            fn_list = [(key, all_results[key][0]) for key in val_data_t if key not in set(res)]
+            s = set(res)
+            fn_list = [(key, all_results[key][0]) for key in val_data_t if key not in s]
             fp_list = [(elem, all_results[elem][0]) for elem in res if not all_results[elem][1]]
             tp_list = [(elem, all_results[elem][0]) for elem in res if all_results[elem][1]]
             
@@ -420,11 +421,11 @@ if ontology_split:
     data_iter = list(range(0, len(ontologies_in_alignment), step))
 else:
     data_iter = list(range(K))
-ontologies_in_alignment = [tuple([elem.split("/")[-1].rsplit(".",1)[0].replace(".", "_").lower() for elem in pair]) for pair in ontologies_in_alignment]
+ontologies_in_alignment = [tuple([elem.split("/")[-1].rsplit(".",1)[0] for elem in pair]) for pair in ontologies_in_alignment]
 
 for index in data_iter:
     print ("Starting sliding window evaluation...")
-    print ("Step {}/{}".format(index, K))
+    print ("Step {}/{}".format(index/step, K))
     if ontology_split:
         # We split on the ontology-pair level
         test_onto = ontologies_in_alignment[index:index+step]
@@ -527,6 +528,8 @@ for index in data_iter:
 
     # Obtain output of model on test set
     final_results.append(test())
+
+    sys.stdout.flush()
 
 threshold_results_mean = {el: np.mean(threshold_results[el], axis=0) for el in threshold_results}    
 threshold = max(threshold_results_mean.keys(), key=(lambda key: threshold_results_mean[key][2]))
