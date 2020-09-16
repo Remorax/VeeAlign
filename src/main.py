@@ -422,7 +422,7 @@ if ontology_split:
 else:
     data_iter = list(range(K))
 ontologies_in_alignment = [tuple([elem.split("/")[-1].rsplit(".",1)[0] for elem in pair]) for pair in ontologies_in_alignment]
-
+print ("step", step, len(ontologies_in_alignment), K)
 for index in data_iter:
     print ("Starting sliding window evaluation...")
     print ("Step {}/{}".format(index, K))
