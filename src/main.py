@@ -206,7 +206,8 @@ def optimize_threshold():
             for i,key in enumerate(all_results):
                 if all_results[key][0] > threshold:
                     res.append(key)
-            fn_list = [(key, all_results[key][0]) for key in val_data_t if key not in set(res)]
+            s = set(res)
+            fn_list = [(key, all_results[key][0]) for key in val_data_t if key not in s]
             fp_list = [(elem, all_results[elem][0]) for elem in res if not all_results[elem][1]]
             tp_list = [(elem, all_results[elem][0]) for elem in res if all_results[elem][1]]
             
@@ -484,7 +485,7 @@ for index in data_iter:
 
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    for epoch in range(num_epochs):
+    for epoch in range(1):
         inputs_pos, nodes_pos, targets_pos = generate_input(train_data_t, 1)
         inputs_neg, nodes_neg, targets_neg = generate_input(train_data_f, 0)
         inputs_all = list(inputs_pos) + list(inputs_neg)
@@ -493,7 +494,7 @@ for index in data_iter:
         
         all_inp = list(zip(inputs_all, targets_all, nodes_all))
         all_inp_shuffled = random.sample(all_inp, len(all_inp))
-        inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled))
+        inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled[:10]))
 
         batch_size = min(batch_size, len(inputs_all))
         num_batches = int(ceil(len(inputs_all)/batch_size))
