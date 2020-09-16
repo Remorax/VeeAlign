@@ -45,18 +45,19 @@ test_data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts, max_types =
 
 class SiameseNetwork(nn.Module):
     # Defines the Siamese Network model
-    def __init__(self, threshold=0.9):
+    def __init__(self, emb_vals, threshold=0.9):
         super().__init__() 
         self.n_neighbours = max_types
         self.max_paths = max_paths
         self.max_pathlen = max_pathlen
         self.embedding_dim = np.array(emb_vals).shape[1]
         
+        self.threshold = nn.Parameter(torch.DoubleTensor([threshold]))
+        self.threshold.requires_grad = False
+
         self.name_embedding = nn.Embedding(len(emb_vals), self.embedding_dim)
         self.name_embedding.load_state_dict({'weight': torch.from_numpy(np.array(emb_vals))})
         self.name_embedding.weight.requires_grad = False
-        
-        self.threshold = threshold
         
         self.cosine_sim_layer = nn.CosineSimilarity(dim=1)
         self.output = nn.Linear(2*self.embedding_dim, 300)
