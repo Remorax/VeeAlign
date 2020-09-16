@@ -1,4 +1,4 @@
-import configparser, logging
+import configparser, logging, random, sys
 import numpy as np
 from collections import OrderedDict
 from math import ceil
@@ -17,8 +17,8 @@ def load_alignments(folder):
     for f in os.listdir(folder):
         doc = minidom.parse(folder + f)
         ls = list(zip(doc.getElementsByTagName('entity1'), doc.getElementsByTagName('entity2')))
-        src = train_folder + doc.getElementsByTagName('Ontology')[0].getAttribute("rdf:about").split("/")[-1].split(".")[0] + ".owl"
-        targ = train_folder + doc.getElementsByTagName('Ontology')[1].getAttribute("rdf:about").split("/")[-1].split(".")[0] + ".owl"
+        src = train_folder + doc.getElementsByTagName('Ontology')[0].getAttribute("rdf:about").split("/")[-1].rsplit(".", 1)[0] + ".owl"
+        targ = train_folder + doc.getElementsByTagName('Ontology')[1].getAttribute("rdf:about").split("/")[-1].rsplit(".", 1)[0] + ".owl"
         ontologies_in_alignment.append((src, targ))
         alignments.extend([(a.getAttribute('rdf:resource'), b.getAttribute('rdf:resource')) for (a,b) in ls])
     return alignments
@@ -27,15 +27,16 @@ def load_alignments(folder):
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1])
+prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1]) + "/"
 
 print ("Prefix path: ", prefix_path)
 
 # Initialize variables from config
 
 language = str(config["General"]["Language"])
-K = str(config["General"]["K"])
-
+K = int(config["General"]["K"])
+ontology_split = str(config["General"]["ontology_split"]) == "True"
+max_false_examples = int(config["General"]["max_false_examples"])
 
 alignment_folder = prefix_path + str(config["Paths"]["alignment_folder"])
 train_folder = prefix_path + str(config["Paths"]["train_folder"])
@@ -45,8 +46,8 @@ spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
 max_neighbours = int(config["Parameters"]["max_paths"])
 min_neighbours = int(config["Parameters"]["max_pathlen"])
-bag_of_neighbours = int(config["Parameters"]["bag_of_neighbours"])
-weighted_average = int(config["Parameters"]["weighted_average"])
+bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
+weighted_average = config["Parameters"]["weighted_average"] == "True"
 
 lr = float(config["Hyperparameters"]["lr"])
 num_epochs = int(config["Hyperparameters"]["num_epochs"])
@@ -55,12 +56,114 @@ batch_size = int(config["Hyperparameters"]["batch_size"])
 
 reference_alignments = load_alignments(alignment_folder)
 gt_mappings = [tuple([elem.split("/")[-1] for elem in el]) for el in reference_alignments]
+gt_mappings = [tuple([el.split("#")[0].rsplit(".", 1)[0] +  "#" +  el.split("#")[1] for el in tup]) for tup in gt_mappings]
 print ("Ontologies being aligned are: ", ontologies_in_alignment)
 
 # Preprocessing and parsing input data for training
 preprocessing = DataParser(ontologies_in_alignment, language, gt_mappings)
-train_data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts, max_paths, max_pathlen, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
+data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
+direct_inputs, direct_targets = [], []
+threshold_results = {}
+
+def optimize_threshold():
+    '''
+    Function to optimise threshold on validation set.
+    Calculates performance metrics (precision, recall, F1-score, F2-score, F0.5-score) for a
+    range of thresholds, dictated by the range of scores output by the model, with step size 
+    0.001 and updates `threshold_results` which is the relevant dictionary.
+    '''
+    global val_data_t, val_data_f, threshold_results, batch_size, direct_inputs, direct_targets
+    all_results = OrderedDict()
+    direct_inputs, direct_targets = [], []
+    with torch.no_grad():
+        all_pred = []
+        
+        np.random.shuffle(val_data_t)
+        np.random.shuffle(val_data_f)
+
+        inputs_pos, nodes_pos, targets_pos = generate_input(val_data_t, 1)
+        inputs_neg, nodes_neg, targets_neg = generate_input(val_data_f, 0)
+
+        inputs_all = list(inputs_pos) + list(inputs_neg)
+        targets_all = list(targets_pos) + list(targets_neg)
+        nodes_all = list(nodes_pos) + list(nodes_neg)
+        
+        all_inp = list(zip(inputs_all, targets_all, nodes_all))
+        all_inp_shuffled = random.sample(all_inp, len(all_inp))
+        inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled))
+
+        batch_size = min(batch_size, len(inputs_all))
+        num_batches = int(ceil(len(inputs_all)/batch_size))
+        for batch_idx in range(num_batches):
+            batch_start = batch_idx * batch_size
+            batch_end = (batch_idx+1) * batch_size
+
+            inputs = np.array(to_feature(inputs_all[batch_start: batch_end]))
+            targets = np.array(targets_all[batch_start: batch_end])
+            nodes = np.array(nodes_all[batch_start: batch_end])
+            
+            inp_elems = torch.LongTensor(inputs).to(device)
+            node_elems = torch.LongTensor(nodes).to(device)
+            targ_elems = torch.DoubleTensor(targets)
+
+            # Run model on input
+            outputs = model(node_elems, inp_elems)
+            outputs = [el.item() for el in outputs]
+            targets = [True if el.item() else False for el in targets]
+
+            for idx, pred_elem in enumerate(outputs):
+                ent1 = emb_indexer_inv[nodes[idx][0]]
+                ent2 = emb_indexer_inv[nodes[idx][1]]
+                all_results[(ent1, ent2)] = (round(pred_elem, 3), targets[idx])
+        
+        direct_targets = [True if el else False for el in direct_targets]
+        
+        print ("Len (direct inputs): ", len(direct_inputs))
+        for idx, direct_input in enumerate(direct_inputs):
+            ent1 = emb_indexer_inv[direct_input[0]]
+            ent2 = emb_indexer_inv[direct_input[1]]
+            sim = cos_sim(emb_vals[direct_input[0]], emb_vals[direct_input[1]])
+            all_results[(ent1, ent2)] = (round(sim, 3), direct_targets[idx])
+        
+        # Low threshold is lowest value output by model and high threshold is the highest value
+        low_threshold = round(np.min([el[0] for el in all_results.values()]) - 0.02, 3)
+        high_threshold = round(np.max([el[0] for el in all_results.values()]) + 0.02, 3)
+        threshold = low_threshold
+        step = 0.001
+
+        # Iterate over every threshold with step size of 0.001 and calculate all evaluation metrics
+        while threshold < high_threshold:
+            threshold = round(threshold, 3)
+            res = []
+            for i,key in enumerate(all_results):
+                if all_results[key][0] > threshold:
+                    res.append(key)
+            s = set(res)
+            fn_list = [(key, all_results[key][0]) for key in val_data_t if key not in s]
+            fp_list = [(elem, all_results[elem][0]) for elem in res if not all_results[elem][1]]
+            tp_list = [(elem, all_results[elem][0]) for elem in res if all_results[elem][1]]
+            
+            tp, fn, fp = len(tp_list), len(fn_list), len(fp_list)
+            exception = False
+            
+            try:
+                precision = tp/(tp+fp)
+                recall = tp/(tp+fn)
+                f1score = 2 * precision * recall / (precision + recall)
+                f2score = 5 * precision * recall / (4 * precision + recall)
+                f0_5score = 1.25 * precision * recall / (0.25 * precision + recall)
+            except:
+                exception = True
+                step = 0.001
+                threshold += step
+                continue
+
+            if threshold in threshold_results:
+                threshold_results[threshold].append([precision, recall, f1score, f2score, f0_5score])
+            else:
+                threshold_results[threshold] = [[precision, recall, f1score, f2score, f0_5score]]
+            threshold += step
 
 class SiameseNetwork(nn.Module):
     # Defines the Siamese Network model
@@ -118,7 +221,7 @@ class SiameseNetwork(nn.Module):
             
             if weighted_average:
                 # Calculate unified path representation as a weighted sum of all paths.
-                path_weights = masked_softmax(path_weights)
+                path_weights = self.masked_softmax(path_weights)
                 feature_emb_reshaped = feature_emb.reshape(-1, self.max_paths, self.max_pathlen * self.embedding_dim)
                 best_path = torch.bmm(path_weights.reshape(-1, 1, self.max_paths), feature_emb_reshaped)
                 best_path = best_path.squeeze(1).reshape(-1, self.n_neighbours, self.max_pathlen, self.embedding_dim)
@@ -132,7 +235,7 @@ class SiameseNetwork(nn.Module):
 
             best_path_reshaped = best_path.permute(0,3,1,2).reshape(-1, self.embedding_dim, self.n_neighbours * self.max_pathlen)
             node_weights = torch.bmm(node_emb.unsqueeze(1), best_path_reshaped) # dim: (batch_size, 4, max_pathlen)
-            node_weights = masked_softmax(node_weights.squeeze(1).reshape(-1, self.n_neighbours, self.max_pathlen)) # dim: (batch_size, 4, max_pathlen)
+            node_weights = self.masked_softmax(node_weights.squeeze(1).reshape(-1, self.n_neighbours, self.max_pathlen)) # dim: (batch_size, 4, max_pathlen)
             attended_path = node_weights.unsqueeze(-1) * best_path # dim: (batch_size, 4, max_pathlen, 512)
 
             distance_weighted_path = torch.sum((self.v[None,None,:,None] * attended_path), dim=2) # batch_size * 4 * 512
@@ -207,14 +310,21 @@ torch.set_default_dtype(torch.float64)
 
 torch.manual_seed(0)
 np.random.seed(0)
+random.seed(0)
 
-data_items = train_data.items()
+data_items = data.items()
 np.random.shuffle(list(data_items))
-train_data = OrderedDict(data_items)
+data = OrderedDict(data_items)
 
-print ("Number of entities:", len(train_data))
+if ontology_split:
+    step = int(len(ontologies_in_alignment)/K)
+
+print ("Number of entities:", len(data))
 
 torch.set_default_dtype(torch.float64)
+
+ontologies_in_alignment = [tuple(pair) for pair in ontologies_in_alignment]
+val_onto = ontologies_in_alignment[len(ontologies_in_alignment)-step:]
 
 train_data_t = [key for key in train_data if train_data[key]]
 train_data_f = [key for key in train_data if not train_data[key]]
