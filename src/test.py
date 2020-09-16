@@ -33,7 +33,7 @@ spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 max_paths = int(config["Parameters"]["max_paths"])
 max_pathlen = int(config["Parameters"]["max_pathlen"])
 bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
-weighted_average = config["Parameters"]["weighted_average"] == "True"
+weighted_sum = config["Parameters"]["weighted_sum"] == "True"
 
 batch_size = int(config["Hyperparameters"]["batch_size"])
 
@@ -98,7 +98,7 @@ class SiameseNetwork(nn.Module):
             path_weights = path_weights.squeeze(1).reshape(-1, self.n_neighbours, self.max_paths, self.max_pathlen)
             path_weights = torch.sum(path_weights, dim=-1)
             
-            if weighted_average:
+            if weighted_sum:
                 # Calculate unified path representation as a weighted sum of all paths.
                 path_weights = self.masked_softmax(path_weights)
                 feature_emb_reshaped = feature_emb.reshape(-1, self.max_paths, self.max_pathlen * self.embedding_dim)
