@@ -30,8 +30,8 @@ model_path = prefix_path + str(config["Paths"]["load_model_path"])
 output_path = prefix_path + str(config["Paths"]["output_folder"])
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
-max_neighbours = int(config["Parameters"]["max_neighbours"])
-min_neighbours = int(config["Parameters"]["min_neighbours"])
+max_paths = int(config["Parameters"]["max_paths"])
+max_pathlen = int(config["Parameters"]["max_pathlen"])
 bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
 weighted_average = config["Parameters"]["weighted_average"] == "True"
 
