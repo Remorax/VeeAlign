@@ -418,6 +418,7 @@ if ontology_split:
     step = int(len(ontologies_in_alignment)/K)
     data_iter = list(range(0, len(ontologies_in_alignment), step))
 else:
+    step = 1
     data_iter = list(range(K))
 ontologies_in_alignment = [tuple([elem.split("/")[-1].rsplit(".",1)[0] for elem in pair]) for pair in ontologies_in_alignment]
 
