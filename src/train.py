@@ -40,12 +40,12 @@ max_false_examples = int(config["General"]["max_false_examples"])
 
 alignment_folder = prefix_path + str(config["Paths"]["alignment_folder"])
 train_folder = prefix_path + str(config["Paths"]["train_folder"])
-model_path = prefix_path + str(config["Paths"]["model_path"])
+model_path = prefix_path + str(config["Paths"]["save_model_path"])
 
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
-max_neighbours = int(config["Parameters"]["max_paths"])
-min_neighbours = int(config["Parameters"]["max_pathlen"])
+max_paths = int(config["Parameters"]["max_paths"])
+max_pathlen = int(config["Parameters"]["max_pathlen"])
 bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
 weighted_average = config["Parameters"]["weighted_average"] == "True"
 
@@ -316,21 +316,45 @@ data_items = data.items()
 np.random.shuffle(list(data_items))
 data = OrderedDict(data_items)
 
-if ontology_split:
-    step = int(len(ontologies_in_alignment)/K)
-
 print ("Number of entities:", len(data))
 
 torch.set_default_dtype(torch.float64)
 
 ontologies_in_alignment = [tuple(pair) for pair in ontologies_in_alignment]
-val_onto = ontologies_in_alignment[len(ontologies_in_alignment)-step:]
 
-train_data_t = [key for key in train_data if train_data[key]]
-train_data_f = [key for key in train_data if not train_data[key]]
+if ontology_split:
+    # We split on the ontology-pair level
+    step = int(len(ontologies_in_alignment)/K)
+    val_onto = ontologies_in_alignment[len(ontologies_in_alignment)-step+1:]
+    train_data = {elem: data[elem] for elem in data if tuple([el.split("#")[0] for el in elem]) not in val_onto}
+    val_data = {elem: data[elem] for elem in data if tuple([el.split("#")[0] for el in elem]) in val_onto}
+
+    train_data_t = [key for key in train_data if train_data[key]]
+    train_data_f = [key for key in train_data if not train_data[key]]
+
+    val_data_t = [key for key in val_data if val_data[key]]
+    val_data_f = [key for key in val_data if not val_data[key]]
+else:
+    # We split on the mapping-pair level
+    ratio = float(1/K)
+    data_t = {elem: data[elem] for elem in data if data[elem]}
+    data_f = {elem: data[elem] for elem in data if not data[elem]}
+
+    data_t_items = list(data_t.keys())
+    data_f_items = list(data_f.keys())
+
+    val_data_t = data_t_items[int((ratio*index)*len(data_t)):int((ratio*index + ratio)*len(data_t))]
+    val_data_f = data_f_items[int((ratio*index)*len(data_f)):int((ratio*index + ratio)*len(data_f))]
+
+    train_data_t = data_t_items[:int(ratio*index*len(data_t))] + data_t_items[int(ratio*(index+1)*len(data_t)):]
+    train_data_f = data_f_items[:int(ratio*index*len(data_f))] + data_f_items[int(ratio*(index+1)*len(data_f)):]
+
+np.random.shuffle(train_data_f)
+train_data_f = train_data_f[:max_false_examples]
+
+# Oversampling to maintain 1:1 ratio between positives and negatives
 train_data_t = np.repeat(train_data_t, ceil(len(train_data_f)/len(train_data_t)), axis=0)
 train_data_t = train_data_t[:len(train_data_f)].tolist()
-np.random.shuffle(train_data_f)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -341,14 +365,15 @@ optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 print ("Starting training...")
 
 for epoch in range(num_epochs):
-    inputs_pos, targets_pos = generate_input(train_data_t, 1)
-    inputs_neg, targets_neg = generate_input(train_data_f, 0)
+    inputs_pos, nodes_pos, targets_pos = generate_input(train_data_t, 1)
+    inputs_neg, nodes_neg, targets_neg = generate_input(train_data_f, 0)
     inputs_all = list(inputs_pos) + list(inputs_neg)
     targets_all = list(targets_pos) + list(targets_neg)
+    nodes_all = list(nodes_pos) + list(nodes_neg)
     
-    indices_all = np.random.permutation(len(inputs_all))
-    inputs_all = np.array(inputs_all)[indices_all]
-    targets_all = np.array(targets_all)[indices_all]
+    all_inp = list(zip(inputs_all, targets_all, nodes_all))
+    all_inp_shuffled = random.sample(all_inp, len(all_inp))
+    inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled))
 
     batch_size = min(batch_size, len(inputs_all))
     num_batches = int(ceil(len(inputs_all)/batch_size))
@@ -357,20 +382,35 @@ for epoch in range(num_epochs):
         batch_start = batch_idx * batch_size
         batch_end = (batch_idx+1) * batch_size
         
-        inputs = inputs_all[batch_start: batch_end]
-        targets = targets_all[batch_start: batch_end]
-        inputs = np.apply_along_axis(embed, 2, inputs)
+        inputs = np.array(to_feature(inputs_all[batch_start: batch_end]))
+        targets = np.array(targets_all[batch_start: batch_end])
+        nodes = np.array(nodes_all[batch_start: batch_end])
         
-        inp_elems = torch.DoubleTensor(inputs).to(device)
+        inp_elems = torch.LongTensor(inputs).to(device)
+        node_elems = torch.LongTensor(nodes).to(device)
         targ_elems = torch.DoubleTensor(targets).to(device)
+
         optimizer.zero_grad()
-        outputs = model(inp_elems)
+        outputs = model(node_elems, inp_elems)
+
         loss = F.mse_loss(outputs, targ_elems)
         loss.backward()
         optimizer.step()
 
-        if batch_idx%1000 == 0:
-            print ("Epoch: {} Idx: {} Loss: {}".format(epoch, batch_idx, loss.item()))
+        if batch_idx%5000 == 0:
+            print ("Epoch: {} Idx: {} Loss: {}".format(epoch, batch_idx, loss.item()))  
 
 print ("Training complete!")
+
+threshold_results_mean = {el: np.mean(threshold_results[el], axis=0) for el in threshold_results}    
+threshold = max(threshold_results_mean.keys(), key=(lambda key: threshold_results_mean[key][2]))
+
+model.eval()
+
+print ("Optimizing threshold...")
+optimize_threshold()
+
+model.threshold = threshold
+
 torch.save(model.state_dict(), model_path)
+print ("Done. Saved model at {}".format(model_path))

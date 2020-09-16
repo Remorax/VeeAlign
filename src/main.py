@@ -40,7 +40,6 @@ max_false_examples = int(config["General"]["max_false_examples"])
 
 alignment_folder = prefix_path + str(config["Paths"]["alignment_folder"])
 train_folder = prefix_path + str(config["Paths"]["train_folder"])
-model_path = prefix_path + str(config["Paths"]["model_path"])
 
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
@@ -48,7 +47,6 @@ spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 # max_pathlen = int(config["Parameters"]["max_pathlen"])
 max_paths = int(sys.argv[2])
 max_pathlen = int(sys.argv[1])
-threshold = float(config["Parameters"]["threshold"])
 # bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
 # weighted_average = config["Parameters"]["weighted_average"] == "True"
 bag_of_neighbours = sys.argv[3] == "True"
