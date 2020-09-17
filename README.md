@@ -8,6 +8,10 @@ Please run the following commands:
 
 1. `conda create --name py37 python=3.7`
 2. `pip3 install -r requirements.txt`
+3. `cd src/`
+4. `python3 main.py`
+
+`main.py` will run with config parameters described in `config.ini`. Details on the configurational parameters and how to set them for reproducibility are described in 
 
 ## Files
 
@@ -29,8 +33,8 @@ This section details in tabular format, the various configurational fields in `c
 | ontology_split     | True       | False        | False    | False         | Determines if training data should be split on ontology level (True) or on element level (False)          |
 | max_false_examples | 150000     | 150000       | 150000   | 150000        | Max number of false (dissimilar) examples to take while training                                          |
 | has_spellcheck     | True       | False        | False    | False         | Whether or not to use an English spelling checker while preprocessing.                                    |
-| max_paths          | 5          | 2            | 16       | 1             | Max number of paths to consider, per node                                                                     |
-| max_pathlen        | 6         | 1            | 1        | 3             | Max length of the path to consider                                                                            |
+| max_paths          | 5          | 6            | 16       | 1             | Max number of paths to consider, per node                                                                     |
+| max_pathlen        | 6         | 5            | 1        | 3             | Max length of the path to consider                                                                            |
 | bag_of_neighbours  | False       | False        | False    | True          | Determines whether one-hop neighbours are treated as a bag of nodes, or path of length one (see paper)     |
 | weighted_sum       | False       | False        | False    | True          | Determines whether unified path representation is computed using weighted sum, or max pooling (see paper) |
 | lr                 | 0.001      | 0.001        | 0.001    | 0.001         | Learning rate                                                                                                 |

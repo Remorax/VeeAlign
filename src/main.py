@@ -231,7 +231,7 @@ def optimize_threshold():
             threshold += step
         
 def calculate_performance():
-    all_metrics, all_fn, all_fp = [], [], []
+    f1_scores, all_fn, all_fp = [], [], []
     for (index, test_data_t, all_results) in final_results:
         res = []
         for i,key in enumerate(all_results):
@@ -247,19 +247,17 @@ def calculate_performance():
             precision = tp/(tp+fp)
             recall = tp/(tp+fn)
             f1score = 2 * precision * recall / (precision + recall)
-            f2score = 5 * precision * recall / (4 * precision + recall)
-            f0_5score = 1.25 * precision * recall / (0.25 * precision + recall)
         except Exception as e:
             print (e)
             continue
         if ontology_split:
-            print ("Performance for ", ontologies_in_alignment[index+2: index+3], "is :", (precision, recall, f1score, f2score, f0_5score))
+            print ("F1-Score for ", ontologies_in_alignment[index+2: index+3], "is :", f1score)
         else:
-            print ("Performance for ", index, "th fold is :", (precision, recall, f1score, f2score, f0_5score))
+            print ("F1-Score for ", index, "th fold is :", f1score)
         all_fn.extend(fn_list)
         all_fp.extend(fp_list)
-        all_metrics.append((precision, recall, f1score, f2score, f0_5score))
-    return all_metrics, all_fn, all_fp
+        f1_scores.append(f1score)
+    return f1_scores, all_fn, all_fp
 
 class SiameseNetwork(nn.Module):
     # Defines the Siamese Network model
@@ -533,7 +531,6 @@ for index in data_iter:
 threshold_results_mean = {el: np.mean(threshold_results[el], axis=0) for el in threshold_results}    
 threshold = max(threshold_results_mean.keys(), key=(lambda key: threshold_results_mean[key][2]))
 
-all_metrics, all_fn, all_fp = calculate_performance()
+all_f1scores, all_fn, all_fp = calculate_performance()
 
-print ("Final Results: " + str(np.mean(all_metrics, axis=0)))
-print ("Threshold: ", threshold)
+print ("Mean F1-score is: {} at optimum threshold of: {}".format(str(np.mean(all_f1scores)), threshold))
