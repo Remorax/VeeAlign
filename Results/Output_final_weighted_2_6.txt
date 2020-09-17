@@ -1,689 +1,706 @@
-2020-09-15 15:49:40.109607: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
-2020-09-15 15:49:43.814937: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcuda.so.1
-2020-09-15 15:49:43.926354: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1716] Found device 0 with properties: 
-pciBusID: 0000:13:00.0 name: Tesla K80 computeCapability: 3.7
+2020-09-16 10:04:20.204484: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+2020-09-16 10:04:29.486311: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcuda.so.1
+2020-09-16 10:04:29.620889: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1716] Found device 0 with properties: 
+pciBusID: 0000:1b:00.0 name: Tesla K80 computeCapability: 3.7
 coreClock: 0.8235GHz coreCount: 13 deviceMemorySize: 11.17GiB deviceMemoryBandwidth: 223.96GiB/s
-2020-09-15 15:49:43.926450: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
-2020-09-15 15:49:43.928468: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.10
-2020-09-15 15:49:43.929875: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcufft.so.10
-2020-09-15 15:49:43.930221: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcurand.so.10
-2020-09-15 15:49:43.932047: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusolver.so.10
-2020-09-15 15:49:43.933392: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusparse.so.10
-2020-09-15 15:49:43.933603: W tensorflow/stream_executor/platform/default/dso_loader.cc:59] Could not load dynamic library 'libcudnn.so.7'; dlerror: libcudnn.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /opt/share/lsf-9.1.3/10.1/linux3.10-glibc2.17-x86_64/lib:=/opt/share/gcc-4.9.2_rhel6/x86_64/lib/:/opt/share/gcc-4.9.2_rhel6/x86_64/lib64:/opt/share/Python-3.6.2/x86_64/lib:=/opt/share/gcc-5.4.0/x86_64/lib/:/opt/share/gcc-5.4.0/x86_64/lib64:/opt/share/isl-0.17/x86_64/lib/:/opt/share/protobuf-3.1.0/x86_64/lib/:/opt/share/leveldb-1.19/x86_64/lib/:/opt/share/boost-1.62.0/x86_64/lib/:/opt/share/torch-7/x86_64/install/lib:/opt/share/Python-2.7.12/x86_64/lib:/opt/share/Python-3.5.2/x86_64/lib:/opt/share/cuDNN-v5.1-8.0/cuda/lib64:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:/opt/share/cuda-8.0/
-2020-09-15 15:49:43.933624: W tensorflow/core/common_runtime/gpu/gpu_device.cc:1753] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above are installed properly if you would like to use GPU. Follow the guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
+2020-09-16 10:04:29.620988: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+2020-09-16 10:04:29.622891: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.10
+2020-09-16 10:04:29.642098: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcufft.so.10
+2020-09-16 10:04:29.699029: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcurand.so.10
+2020-09-16 10:04:29.761820: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusolver.so.10
+2020-09-16 10:04:29.795112: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusparse.so.10
+2020-09-16 10:04:29.795488: W tensorflow/stream_executor/platform/default/dso_loader.cc:59] Could not load dynamic library 'libcudnn.so.7'; dlerror: libcudnn.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /opt/share/lsf-9.1.3/10.1/linux3.10-glibc2.17-x86_64/lib:/usr/local/cuda/lib64
+2020-09-16 10:04:29.795510: W tensorflow/core/common_runtime/gpu/gpu_device.cc:1753] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above are installed properly if you would like to use GPU. Follow the guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
 Skipping registering GPU devices...
-2020-09-15 15:49:43.933928: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN)to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+2020-09-16 10:04:29.795952: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN)to use the following CPU instructions in performance-critical operations:  AVX2 FMA
 To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2020-09-15 15:49:43.940564: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2600010000 Hz
-2020-09-15 15:49:43.940737: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x556954426620 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
-2020-09-15 15:49:43.940757: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
-2020-09-15 15:49:43.942503: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1257] Device interconnect StreamExecutor with strength 1 edge matrix:
-2020-09-15 15:49:43.942531: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1263]      
-Prefix path:  /dccstor/cogfin/arvind/da/VeeAlign/
-Ontologies being aligned are:  [('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/confOf.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/conference.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/conference.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/cmt.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/ekaw.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/cmt.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/conference.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/edas.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/conference.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/edas.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/cmt.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/confOf.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/cmt.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/ekaw.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/conference.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/confOf.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/edas.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/cmt.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/edas.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/cmt.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/confOf.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/iasted.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/edas.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/edas.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/confOf.owl', '/dccstor/cogfin/arvind/da/VeeAlign/datasets/conference/ontologies/iasted.owl')]
+2020-09-16 10:04:29.817496: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2600120000 Hz
+2020-09-16 10:04:29.817718: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55c2fbfd2520 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-09-16 10:04:29.817737: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-09-16 10:04:29.819819: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1257] Device interconnect StreamExecutor with strength 1 edge matrix:
+2020-09-16 10:04:29.819843: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1263]      
+Prefix path:  /u/shagutt1/VeeAlign/
+Ontologies being aligned are:  [('/u/shagutt1/VeeAlign/datasets/conference/ontologies/conference.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/confOf.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/confOf.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/conference.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/conference.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/cmt.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/ekaw.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/cmt.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/conference.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/edas.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/conference.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/edas.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/cmt.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/confOf.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/cmt.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/ekaw.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/conference.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/confOf.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/edas.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/cmt.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/edas.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/cmt.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/confOf.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/iasted.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/sigkdd.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/edas.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/iasted.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/edas.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/ekaw.owl'), ('/u/shagutt1/VeeAlign/datasets/conference/ontologies/confOf.owl', '/u/shagutt1/VeeAlign/datasets/conference/ontologies/iasted.owl')]
 Total number of extracted unique classes and properties from entire RA set:  829
 Constructing abbrevation resolution dict....
 Results after abbreviation resolution:  {'PC': 'Program Committee', 'OC': 'Organizing Committee'}
 Resolving abbreviations...
-Number of entities: 119639
+Number of entities: 122893
 Starting sliding window evaluation...
-Step 0/7
-Val onto:  [('confof', 'ekaw')] test_onto:  [('conference', 'sigkdd')]
+Step 0.0/7
+Val onto:  [('conference', 'confOf'), ('confOf', 'ekaw')] test_onto:  [('conference', 'sigkdd')]
 Training size: 112565 Testing size: 3871
-Epoch: 0 Idx: 0 Loss: 0.18236864052488122
-Epoch: 0 Idx: 5000 Loss: 0.006756371045092652
-Epoch: 1 Idx: 0 Loss: 0.022828102884398512
-Epoch: 1 Idx: 5000 Loss: 0.0108178146698918
-Epoch: 2 Idx: 0 Loss: 0.008695305937343611
-Epoch: 2 Idx: 5000 Loss: 0.021754147812672778
-Epoch: 3 Idx: 0 Loss: 0.01541650054963735
-Epoch: 3 Idx: 5000 Loss: 0.034375131809859405
-Epoch: 4 Idx: 0 Loss: 0.014098472826207022
-Epoch: 4 Idx: 5000 Loss: 0.012273191559966215
-Epoch: 5 Idx: 0 Loss: 0.007575552787298947
-Epoch: 5 Idx: 5000 Loss: 0.0058028097550294234
-Epoch: 6 Idx: 0 Loss: 0.011002489399723153
-Epoch: 6 Idx: 5000 Loss: 0.017566970944422944
-Epoch: 7 Idx: 0 Loss: 0.01482543866993999
-Epoch: 7 Idx: 5000 Loss: 0.01449172675095517
-Epoch: 8 Idx: 0 Loss: 0.014458604871295286
-Epoch: 8 Idx: 5000 Loss: 0.00913053150457641
-Epoch: 9 Idx: 0 Loss: 0.008100264793051312
-Epoch: 9 Idx: 5000 Loss: 0.011505984208665962
-Epoch: 10 Idx: 0 Loss: 0.02618454654984672
-Epoch: 10 Idx: 5000 Loss: 0.0394523284799365
-Epoch: 11 Idx: 0 Loss: 0.00951874485339585
-Epoch: 11 Idx: 5000 Loss: 0.051296112736073984
-Epoch: 12 Idx: 0 Loss: 0.010623545294982058
-Epoch: 12 Idx: 5000 Loss: 0.011229730681753654
-Epoch: 13 Idx: 0 Loss: 0.026192500510179018
-Epoch: 13 Idx: 5000 Loss: 0.004650021838570172
-Epoch: 14 Idx: 0 Loss: 0.011125686764653942
-Epoch: 14 Idx: 5000 Loss: 0.00575841318019486
-Epoch: 15 Idx: 0 Loss: 0.010951181540056143
-Epoch: 15 Idx: 5000 Loss: 0.037140646972190425
-Epoch: 16 Idx: 0 Loss: 0.010841781980830576
-Epoch: 16 Idx: 5000 Loss: 0.016349054010658105
-Epoch: 17 Idx: 0 Loss: 0.007517226394811032
-Epoch: 17 Idx: 5000 Loss: 0.01101750175802685
-Epoch: 18 Idx: 0 Loss: 0.02267102765689842
-Epoch: 18 Idx: 5000 Loss: 0.01202385647061318
-Epoch: 19 Idx: 0 Loss: 0.021604844512023828
-Epoch: 19 Idx: 5000 Loss: 0.025368631395641186
-Epoch: 20 Idx: 0 Loss: 0.014419247159878657
-Epoch: 20 Idx: 5000 Loss: 0.012279151737329116
-Epoch: 21 Idx: 0 Loss: 0.0073547531951914545
-Epoch: 21 Idx: 5000 Loss: 0.020613785740967748
-Epoch: 22 Idx: 0 Loss: 0.03635338967810699
-Epoch: 22 Idx: 5000 Loss: 0.03233661002974001
-Epoch: 23 Idx: 0 Loss: 0.013600508427919225
-Epoch: 23 Idx: 5000 Loss: 0.01605434135176947
-Epoch: 24 Idx: 0 Loss: 0.01527849701718128
-Epoch: 24 Idx: 5000 Loss: 0.03048416644230268
-Epoch: 25 Idx: 0 Loss: 0.019525506562548835
-Epoch: 25 Idx: 5000 Loss: 0.025295720321226865
-Epoch: 26 Idx: 0 Loss: 0.012468266701411738
-Epoch: 26 Idx: 5000 Loss: 0.01274566619633242
-Epoch: 27 Idx: 0 Loss: 0.020348785640195002
-Epoch: 27 Idx: 5000 Loss: 0.01942211326068651
-Epoch: 28 Idx: 0 Loss: 0.017552743348731206
-Epoch: 28 Idx: 5000 Loss: 0.04866878816588184
-Epoch: 29 Idx: 0 Loss: 0.008660536549032585
-Epoch: 29 Idx: 5000 Loss: 0.006000535346912722
-Epoch: 30 Idx: 0 Loss: 0.0273175179662948
-Epoch: 30 Idx: 5000 Loss: 0.006861792403355793
-Epoch: 31 Idx: 0 Loss: 0.012443906473086875
-Epoch: 31 Idx: 5000 Loss: 0.01734629706254808
-Epoch: 32 Idx: 0 Loss: 0.008165285095051647
-Epoch: 32 Idx: 5000 Loss: 0.01647830528533374
-Epoch: 33 Idx: 0 Loss: 0.03609334832184437
-Epoch: 33 Idx: 5000 Loss: 0.028012864548022695
-Epoch: 34 Idx: 0 Loss: 0.005823322186994705
-Epoch: 34 Idx: 5000 Loss: 0.017999021226282615
-Epoch: 35 Idx: 0 Loss: 0.013201135948244699
-Epoch: 35 Idx: 5000 Loss: 0.01577276333774422
-Epoch: 36 Idx: 0 Loss: 0.017136667822465604
-Epoch: 36 Idx: 5000 Loss: 0.013424311897296494
-Epoch: 37 Idx: 0 Loss: 0.02906227961453678
-Epoch: 37 Idx: 5000 Loss: 0.045753675578236036
-Epoch: 38 Idx: 0 Loss: 0.01049173034489877
-Epoch: 38 Idx: 5000 Loss: 0.025178701234063017
-Epoch: 39 Idx: 0 Loss: 0.03349138128492221
-Epoch: 39 Idx: 5000 Loss: 0.013119874304303359
-Epoch: 40 Idx: 0 Loss: 0.010441546026643378
-Epoch: 40 Idx: 5000 Loss: 0.007567408261103317
-Epoch: 41 Idx: 0 Loss: 0.026335828419822994
-Epoch: 41 Idx: 5000 Loss: 0.009697256055388306
-Epoch: 42 Idx: 0 Loss: 0.008639833576433852
-Epoch: 42 Idx: 5000 Loss: 0.011610181452528612
-Epoch: 43 Idx: 0 Loss: 0.010723279478710941
-Epoch: 43 Idx: 5000 Loss: 0.011025935007960005
-Epoch: 44 Idx: 0 Loss: 0.013443355841833756
-Epoch: 44 Idx: 5000 Loss: 0.0300883489250836
-Epoch: 45 Idx: 0 Loss: 0.01289172476243929
-Epoch: 45 Idx: 5000 Loss: 0.026953548402344193
-Epoch: 46 Idx: 0 Loss: 0.008007372886187237
-Epoch: 46 Idx: 5000 Loss: 0.008913006659696234
-Epoch: 47 Idx: 0 Loss: 0.009094123213421117
-Epoch: 47 Idx: 5000 Loss: 0.010293975464282689
-Epoch: 48 Idx: 0 Loss: 0.014118678267718296
-Epoch: 48 Idx: 5000 Loss: 0.014658248834908582
-Epoch: 49 Idx: 0 Loss: 0.01792901086878195
-Epoch: 49 Idx: 5000 Loss: 0.014232560493239774
-Len (direct inputs):  429
+Epoch: 0 Idx: 0 Loss: 0.17526824962782445
+Epoch: 0 Idx: 5000 Loss: 0.01658777794926787
+Epoch: 1 Idx: 0 Loss: 0.017300599157328806
+Epoch: 1 Idx: 5000 Loss: 0.019121299852928986
+Epoch: 2 Idx: 0 Loss: 0.011589081238690043
+Epoch: 2 Idx: 5000 Loss: 0.011140619963648225
+Epoch: 3 Idx: 0 Loss: 0.011247455657423923
+Epoch: 3 Idx: 5000 Loss: 0.010125775210397423
+Epoch: 4 Idx: 0 Loss: 0.015468769649469135
+Epoch: 4 Idx: 5000 Loss: 0.016726966747197293
+Epoch: 5 Idx: 0 Loss: 0.018402668541094958
+Epoch: 5 Idx: 5000 Loss: 0.02137225882741333
+Epoch: 6 Idx: 0 Loss: 0.015286661068015099
+Epoch: 6 Idx: 5000 Loss: 0.011533702828240419
+Epoch: 7 Idx: 0 Loss: 0.006774922424733927
+Epoch: 7 Idx: 5000 Loss: 0.009988896903463306
+Epoch: 8 Idx: 0 Loss: 0.01031127052753388
+Epoch: 8 Idx: 5000 Loss: 0.015640736315767192
+Epoch: 9 Idx: 0 Loss: 0.009493581596436616
+Epoch: 9 Idx: 5000 Loss: 0.006759753704462693
+Epoch: 10 Idx: 0 Loss: 0.00923861033648698
+Epoch: 10 Idx: 5000 Loss: 0.014723912362022015
+Epoch: 11 Idx: 0 Loss: 0.03560632955787199
+Epoch: 11 Idx: 5000 Loss: 0.02736572321590179
+Epoch: 12 Idx: 0 Loss: 0.012225336269105458
+Epoch: 12 Idx: 5000 Loss: 0.023979686811357852
+Epoch: 13 Idx: 0 Loss: 0.007669023441754594
+Epoch: 13 Idx: 5000 Loss: 0.021761159566310095
+Epoch: 14 Idx: 0 Loss: 0.051586819018417385
+Epoch: 14 Idx: 5000 Loss: 0.02087238138831267
+Epoch: 15 Idx: 0 Loss: 0.017025599442252595
+Epoch: 15 Idx: 5000 Loss: 0.02990074431591763
+Epoch: 16 Idx: 0 Loss: 0.020362357315324514
+Epoch: 16 Idx: 5000 Loss: 0.010210237718105645
+Epoch: 17 Idx: 0 Loss: 0.02543389223544381
+Epoch: 17 Idx: 5000 Loss: 0.015475732399379985
+Epoch: 18 Idx: 0 Loss: 0.033817124761961866
+Epoch: 18 Idx: 5000 Loss: 0.012309071380683257
+Epoch: 19 Idx: 0 Loss: 0.008102983685220453
+Epoch: 19 Idx: 5000 Loss: 0.01463115339408814
+Epoch: 20 Idx: 0 Loss: 0.01416654227305816
+Epoch: 20 Idx: 5000 Loss: 0.009173869361718844
+Epoch: 21 Idx: 0 Loss: 0.014901619495818544
+Epoch: 21 Idx: 5000 Loss: 0.024105242559902686
+Epoch: 22 Idx: 0 Loss: 0.014541069497534012
+Epoch: 22 Idx: 5000 Loss: 0.02901529743207021
+Epoch: 23 Idx: 0 Loss: 0.008467450507047542
+Epoch: 23 Idx: 5000 Loss: 0.024848326831603897
+Epoch: 24 Idx: 0 Loss: 0.015642341681708555
+Epoch: 24 Idx: 5000 Loss: 0.010377350700720574
+Epoch: 25 Idx: 0 Loss: 0.03762872952064472
+Epoch: 25 Idx: 5000 Loss: 0.0114700276362555
+Epoch: 26 Idx: 0 Loss: 0.013068270061098935
+Epoch: 26 Idx: 5000 Loss: 0.011804610320594874
+Epoch: 27 Idx: 0 Loss: 0.007717526530058213
+Epoch: 27 Idx: 5000 Loss: 0.03627570903100741
+Epoch: 28 Idx: 0 Loss: 0.00861405377573416
+Epoch: 28 Idx: 5000 Loss: 0.012417593653516551
+Epoch: 29 Idx: 0 Loss: 0.011657107356991357
+Epoch: 29 Idx: 5000 Loss: 0.03699295471545861
+Epoch: 30 Idx: 0 Loss: 0.016234958812802024
+Epoch: 30 Idx: 5000 Loss: 0.01225298130421673
+Epoch: 31 Idx: 0 Loss: 0.011333834713870523
+Epoch: 31 Idx: 5000 Loss: 0.007502448764701738
+Epoch: 32 Idx: 0 Loss: 0.024386141322852283
+Epoch: 32 Idx: 5000 Loss: 0.012334927626591297
+Epoch: 33 Idx: 0 Loss: 0.027019688342078137
+Epoch: 33 Idx: 5000 Loss: 0.010808485403409587
+Epoch: 34 Idx: 0 Loss: 0.007740967297467337
+Epoch: 34 Idx: 5000 Loss: 0.012069949056522977
+Epoch: 35 Idx: 0 Loss: 0.011449262190482815
+Epoch: 35 Idx: 5000 Loss: 0.017638901168009608
+Epoch: 36 Idx: 0 Loss: 0.037080276646940594
+Epoch: 36 Idx: 5000 Loss: 0.010422504592509638
+Epoch: 37 Idx: 0 Loss: 0.0267359340387402
+Epoch: 37 Idx: 5000 Loss: 0.035052324053465575
+Epoch: 38 Idx: 0 Loss: 0.019613436538431343
+Epoch: 38 Idx: 5000 Loss: 0.01898947063608311
+Epoch: 39 Idx: 0 Loss: 0.029924776999565292
+Epoch: 39 Idx: 5000 Loss: 0.014256868995858353
+Epoch: 40 Idx: 0 Loss: 0.011196383735148176
+Epoch: 40 Idx: 5000 Loss: 0.013339407826782257
+Epoch: 41 Idx: 0 Loss: 0.007888611101125043
+Epoch: 41 Idx: 5000 Loss: 0.03642937163060637
+Epoch: 42 Idx: 0 Loss: 0.008717728215025467
+Epoch: 42 Idx: 5000 Loss: 0.017073238352761668
+Epoch: 43 Idx: 0 Loss: 0.01278904103361743
+Epoch: 43 Idx: 5000 Loss: 0.015826461643691205
+Epoch: 44 Idx: 0 Loss: 0.006235389148157928
+Epoch: 44 Idx: 5000 Loss: 0.01257568774291945
+Epoch: 45 Idx: 0 Loss: 0.01761018778518648
+Epoch: 45 Idx: 5000 Loss: 0.012009585078801746
+Epoch: 46 Idx: 0 Loss: 0.016232542195026657
+Epoch: 46 Idx: 5000 Loss: 0.014181366051180581
+Epoch: 47 Idx: 0 Loss: 0.006640400759950272
+Epoch: 47 Idx: 5000 Loss: 0.007699603956752885
+Epoch: 48 Idx: 0 Loss: 0.00996238172143996
+Epoch: 48 Idx: 5000 Loss: 0.023712122083129075
+Epoch: 49 Idx: 0 Loss: 0.010178714888191628
+Epoch: 49 Idx: 5000 Loss: 0.0162487941815823
+Len (direct inputs):  1555
 Inputs len 2744 15 3856
 Len (direct inputs):  1127
 Starting sliding window evaluation...
-Step 2/7
-Val onto:  [('conference', 'ekaw')] test_onto:  [('cmt', 'sigkdd')]
-Training size: 111450 Testing size: 2364
-Epoch: 0 Idx: 0 Loss: 0.13559331715441866
-Epoch: 0 Idx: 5000 Loss: 0.030491175579332574
-Epoch: 1 Idx: 0 Loss: 0.010284666957086228
-Epoch: 1 Idx: 5000 Loss: 0.011829085671296527
-Epoch: 2 Idx: 0 Loss: 0.018875688741862802
-Epoch: 2 Idx: 5000 Loss: 0.01811984450306639
-Epoch: 3 Idx: 0 Loss: 0.025058406371198886
-Epoch: 3 Idx: 5000 Loss: 0.01019012214061265
-Epoch: 4 Idx: 0 Loss: 0.013095027678033886
-Epoch: 4 Idx: 5000 Loss: 0.013786050012651535
-Epoch: 5 Idx: 0 Loss: 0.023382125051162973
-Epoch: 5 Idx: 5000 Loss: 0.029170187057415024
-Epoch: 6 Idx: 0 Loss: 0.010292227246049859
-Epoch: 6 Idx: 5000 Loss: 0.0114033875186804
-Epoch: 7 Idx: 0 Loss: 0.008343576037052278
-Epoch: 7 Idx: 5000 Loss: 0.018023741836211353
-Epoch: 8 Idx: 0 Loss: 0.012736044732786684
-Epoch: 8 Idx: 5000 Loss: 0.005712869570587668
-Epoch: 9 Idx: 0 Loss: 0.013241219261724087
-Epoch: 9 Idx: 5000 Loss: 0.026547519770336758
-Epoch: 10 Idx: 0 Loss: 0.00863068936758973
-Epoch: 10 Idx: 5000 Loss: 0.01679114911008717
-Epoch: 11 Idx: 0 Loss: 0.012592721412666836
-Epoch: 11 Idx: 5000 Loss: 0.007367384088354755
-Epoch: 12 Idx: 0 Loss: 0.0166956515491506
-Epoch: 12 Idx: 5000 Loss: 0.011304103524829294
-Epoch: 13 Idx: 0 Loss: 0.017033196803875675
-Epoch: 13 Idx: 5000 Loss: 0.008101204565609702
-Epoch: 14 Idx: 0 Loss: 0.015014047478122804
-Epoch: 14 Idx: 5000 Loss: 0.008503224385066038
-Epoch: 15 Idx: 0 Loss: 0.009240877353686101
-Epoch: 15 Idx: 5000 Loss: 0.007764393862351785
-Epoch: 16 Idx: 0 Loss: 0.018054909966923487
-Epoch: 16 Idx: 5000 Loss: 0.02092017859941916
-Epoch: 17 Idx: 0 Loss: 0.01147184101357053
-Epoch: 17 Idx: 5000 Loss: 0.029405756624437614
-Epoch: 18 Idx: 0 Loss: 0.01717725934693049
-Epoch: 18 Idx: 5000 Loss: 0.018935229226777574
-Epoch: 19 Idx: 0 Loss: 0.029650999634288005
-Epoch: 19 Idx: 5000 Loss: 0.007677218850291428
-Epoch: 20 Idx: 0 Loss: 0.009194305378425865
-Epoch: 20 Idx: 5000 Loss: 0.026899275058110447
-Epoch: 21 Idx: 0 Loss: 0.019723703771768467
-Epoch: 21 Idx: 5000 Loss: 0.008540604417028643
-Epoch: 22 Idx: 0 Loss: 0.018403689662339212
-Epoch: 22 Idx: 5000 Loss: 0.017361374035277034
-Epoch: 23 Idx: 0 Loss: 0.008397054794210984
-Epoch: 23 Idx: 5000 Loss: 0.007351491545082145
-Epoch: 24 Idx: 0 Loss: 0.025483556781060276
-Epoch: 24 Idx: 5000 Loss: 0.017440891886155475
-Epoch: 25 Idx: 0 Loss: 0.023787109289769327
-Epoch: 25 Idx: 5000 Loss: 0.01322920054215921
-Epoch: 26 Idx: 0 Loss: 0.01706518674270523
-Epoch: 26 Idx: 5000 Loss: 0.012717766303079473
-Epoch: 27 Idx: 0 Loss: 0.020087185441209528
-Epoch: 27 Idx: 5000 Loss: 0.009141827434854007
-Epoch: 28 Idx: 0 Loss: 0.008536527526811888
-Epoch: 28 Idx: 5000 Loss: 0.02532153957192395
-Epoch: 29 Idx: 0 Loss: 0.013201459652834122
-Epoch: 29 Idx: 5000 Loss: 0.008553876592550275
-Epoch: 30 Idx: 0 Loss: 0.03312150213229512
-Epoch: 30 Idx: 5000 Loss: 0.02208943770846556
-Epoch: 31 Idx: 0 Loss: 0.009282833464436825
-Epoch: 31 Idx: 5000 Loss: 0.030103302257810986
-Epoch: 32 Idx: 0 Loss: 0.01037880645962289
-Epoch: 32 Idx: 5000 Loss: 0.019690196795926873
-Epoch: 33 Idx: 0 Loss: 0.006468128096516836
-Epoch: 33 Idx: 5000 Loss: 0.017463979307305273
-Epoch: 34 Idx: 0 Loss: 0.011276319255443833
-Epoch: 34 Idx: 5000 Loss: 0.010318826417307253
-Epoch: 35 Idx: 0 Loss: 0.006299330677237545
-Epoch: 35 Idx: 5000 Loss: 0.02635507058779069
-Epoch: 36 Idx: 0 Loss: 0.011794968712582756
-Epoch: 36 Idx: 5000 Loss: 0.017055862984024117
-Epoch: 37 Idx: 0 Loss: 0.006251830890236771
-Epoch: 37 Idx: 5000 Loss: 0.014746387188422916
-Epoch: 38 Idx: 0 Loss: 0.015128998678493613
-Epoch: 38 Idx: 5000 Loss: 0.012905010500982047
-Epoch: 39 Idx: 0 Loss: 0.009720331169592679
-Epoch: 39 Idx: 5000 Loss: 0.03850169253315974
-Epoch: 40 Idx: 0 Loss: 0.012000405354894817
-Epoch: 40 Idx: 5000 Loss: 0.012146491684501106
-Epoch: 41 Idx: 0 Loss: 0.01123986454600975
-Epoch: 41 Idx: 5000 Loss: 0.014665993569388735
-Epoch: 42 Idx: 0 Loss: 0.0181312342286388
-Epoch: 42 Idx: 5000 Loss: 0.01425368180544882
-Epoch: 43 Idx: 0 Loss: 0.00945286988466388
-Epoch: 43 Idx: 5000 Loss: 0.010191693280779351
-Epoch: 44 Idx: 0 Loss: 0.017198517977467232
-Epoch: 44 Idx: 5000 Loss: 0.011689004514397524
-Epoch: 45 Idx: 0 Loss: 0.009824586281451459
-Epoch: 45 Idx: 5000 Loss: 0.006415479454176065
-Epoch: 46 Idx: 0 Loss: 0.00892555372922457
-Epoch: 46 Idx: 5000 Loss: 0.021457514479145134
-Epoch: 47 Idx: 0 Loss: 0.005861776211110877
-Epoch: 47 Idx: 5000 Loss: 0.011151600157033792
-Epoch: 48 Idx: 0 Loss: 0.015232618418256794
-Epoch: 48 Idx: 5000 Loss: 0.014651962188081739
-Epoch: 49 Idx: 0 Loss: 0.01367037640751544
-Epoch: 49 Idx: 5000 Loss: 0.01334249654656818
-Len (direct inputs):  1737
-Inputs len 1372 12 2352
-Len (direct inputs):  992
-Starting sliding window evaluation...
-Step 4/7
-Val onto:  [('ekaw', 'sigkdd')] test_onto:  [('cmt', 'conference')]
-Training size: 111356 Testing size: 4145
-Epoch: 0 Idx: 0 Loss: 0.1503057843929546
-Epoch: 0 Idx: 5000 Loss: 0.027921949222985513
-Epoch: 1 Idx: 0 Loss: 0.008640744196992801
-Epoch: 1 Idx: 5000 Loss: 0.011071684724800104
-Epoch: 2 Idx: 0 Loss: 0.012543502944127243
-Epoch: 2 Idx: 5000 Loss: 0.021867262952637294
-Epoch: 3 Idx: 0 Loss: 0.013147043547211319
-Epoch: 3 Idx: 5000 Loss: 0.007256771918252278
-Epoch: 4 Idx: 0 Loss: 0.009695485502289405
-Epoch: 4 Idx: 5000 Loss: 0.008582652073900734
-Epoch: 5 Idx: 0 Loss: 0.01741584239302052
-Epoch: 5 Idx: 5000 Loss: 0.008060095320958261
-Epoch: 6 Idx: 0 Loss: 0.009441401020984173
-Epoch: 6 Idx: 5000 Loss: 0.01531997361624413
-Epoch: 7 Idx: 0 Loss: 0.021488418086209007
-Epoch: 7 Idx: 5000 Loss: 0.019098120745163084
-Epoch: 8 Idx: 0 Loss: 0.005429518672395772
-Epoch: 8 Idx: 5000 Loss: 0.010822063330940795
-Epoch: 9 Idx: 0 Loss: 0.013825378696516984
-Epoch: 9 Idx: 5000 Loss: 0.013220914524938664
-Epoch: 10 Idx: 0 Loss: 0.0071479920723176715
-Epoch: 10 Idx: 5000 Loss: 0.007765312766666855
-Epoch: 11 Idx: 0 Loss: 0.010619416590781892
-Epoch: 11 Idx: 5000 Loss: 0.04453446704452245
-Epoch: 12 Idx: 0 Loss: 0.023768872357607895
-Epoch: 12 Idx: 5000 Loss: 0.010951590263910179
-Epoch: 13 Idx: 0 Loss: 0.0072262678267460976
-Epoch: 13 Idx: 5000 Loss: 0.0192285181327063
-Epoch: 14 Idx: 0 Loss: 0.01329017841189703
-Epoch: 14 Idx: 5000 Loss: 0.009402981859433779
-Epoch: 15 Idx: 0 Loss: 0.029322992341275812
-Epoch: 15 Idx: 5000 Loss: 0.016828278958459925
-Epoch: 16 Idx: 0 Loss: 0.019053292777751
-Epoch: 16 Idx: 5000 Loss: 0.010092200755640116
-Epoch: 17 Idx: 0 Loss: 0.020537255230961955
-Epoch: 17 Idx: 5000 Loss: 0.013798103917862785
-Epoch: 18 Idx: 0 Loss: 0.009404488846862546
-Epoch: 18 Idx: 5000 Loss: 0.01767532701004004
-Epoch: 19 Idx: 0 Loss: 0.014293767319028258
-Epoch: 19 Idx: 5000 Loss: 0.03546810306928715
-Epoch: 20 Idx: 0 Loss: 0.010150997405784491
-Epoch: 20 Idx: 5000 Loss: 0.022723340847707565
-Epoch: 21 Idx: 0 Loss: 0.011056629484215671
-Epoch: 21 Idx: 5000 Loss: 0.0123494064391907
-Epoch: 22 Idx: 0 Loss: 0.038042251306132924
-Epoch: 22 Idx: 5000 Loss: 0.01703700196765822
-Epoch: 23 Idx: 0 Loss: 0.02231983691651776
-Epoch: 23 Idx: 5000 Loss: 0.016852278548860865
-Epoch: 24 Idx: 0 Loss: 0.011143642468556514
-Epoch: 24 Idx: 5000 Loss: 0.02606090476567854
-Epoch: 25 Idx: 0 Loss: 0.0074789952766685
-Epoch: 25 Idx: 5000 Loss: 0.01287856092379778
-Epoch: 26 Idx: 0 Loss: 0.016021171821520054
-Epoch: 26 Idx: 5000 Loss: 0.011739676732439941
-Epoch: 27 Idx: 0 Loss: 0.021160132575549086
-Epoch: 27 Idx: 5000 Loss: 0.009910079491836712
-Epoch: 28 Idx: 0 Loss: 0.021867221476835567
-Epoch: 28 Idx: 5000 Loss: 0.0138608004802089
-Epoch: 29 Idx: 0 Loss: 0.014187742895451001
-Epoch: 29 Idx: 5000 Loss: 0.016523689661161425
-Epoch: 30 Idx: 0 Loss: 0.005628618356036881
-Epoch: 30 Idx: 5000 Loss: 0.019039758482047923
-Epoch: 31 Idx: 0 Loss: 0.01738062511996586
-Epoch: 31 Idx: 5000 Loss: 0.013455623388385803
-Epoch: 32 Idx: 0 Loss: 0.018957133992754196
-Epoch: 32 Idx: 5000 Loss: 0.007303486095161295
-Epoch: 33 Idx: 0 Loss: 0.005431561895826973
-Epoch: 33 Idx: 5000 Loss: 0.013697729824285994
-Epoch: 34 Idx: 0 Loss: 0.015413482731418671
-Epoch: 34 Idx: 5000 Loss: 0.007638849290051625
-Epoch: 35 Idx: 0 Loss: 0.021285489638605926
-Epoch: 35 Idx: 5000 Loss: 0.031952317455217844
-Epoch: 36 Idx: 0 Loss: 0.00930113404360372
-Epoch: 36 Idx: 5000 Loss: 0.012629583486326073
-Epoch: 37 Idx: 0 Loss: 0.017489124239119937
-Epoch: 37 Idx: 5000 Loss: 0.017885186200028755
-Epoch: 38 Idx: 0 Loss: 0.009615496333399809
-Epoch: 38 Idx: 5000 Loss: 0.013330140779183213
-Epoch: 39 Idx: 0 Loss: 0.018331432252349632
-Epoch: 39 Idx: 5000 Loss: 0.01441343679778277
-Epoch: 40 Idx: 0 Loss: 0.02519788576413231
-Epoch: 40 Idx: 5000 Loss: 0.00924368758501637
-Epoch: 41 Idx: 0 Loss: 0.012228217870110317
-Epoch: 41 Idx: 5000 Loss: 0.013446910530666798
-Epoch: 42 Idx: 0 Loss: 0.028046348806094024
-Epoch: 42 Idx: 5000 Loss: 0.012555984060341845
-Epoch: 43 Idx: 0 Loss: 0.006812583971929876
-Epoch: 43 Idx: 5000 Loss: 0.01579140546094335
-Epoch: 44 Idx: 0 Loss: 0.009922790113968676
-Epoch: 44 Idx: 5000 Loss: 0.010418232169602536
-Epoch: 45 Idx: 0 Loss: 0.022203006651955938
-Epoch: 45 Idx: 5000 Loss: 0.018595861857129463
-Epoch: 46 Idx: 0 Loss: 0.016984440759101778
-Epoch: 46 Idx: 5000 Loss: 0.015551894054249971
-Epoch: 47 Idx: 0 Loss: 0.015579782552959661
-Epoch: 47 Idx: 5000 Loss: 0.010041089095845505
-Epoch: 48 Idx: 0 Loss: 0.008968161366746953
-Epoch: 48 Idx: 5000 Loss: 0.009292862293450532
-Epoch: 49 Idx: 0 Loss: 0.0186548078250345
-Epoch: 49 Idx: 5000 Loss: 0.008664518805011916
+Step 1.0/7
+Val onto:  [('conference', 'ekaw'), ('cmt', 'sigkdd')] test_onto:  [('ekaw', 'sigkdd')]
+Training size: 110566 Testing size: 4138
+Epoch: 0 Idx: 0 Loss: 0.24108547814624526
+Epoch: 0 Idx: 5000 Loss: 0.026686590107057172
+Epoch: 1 Idx: 0 Loss: 0.007772642165794978
+Epoch: 1 Idx: 5000 Loss: 0.016267520510109865
+Epoch: 2 Idx: 0 Loss: 0.021327258776157706
+Epoch: 2 Idx: 5000 Loss: 0.012892649224592876
+Epoch: 3 Idx: 0 Loss: 0.02325700646778395
+Epoch: 3 Idx: 5000 Loss: 0.010080040329141084
+Epoch: 4 Idx: 0 Loss: 0.00665033905532646
+Epoch: 4 Idx: 5000 Loss: 0.00498905195711237
+Epoch: 5 Idx: 0 Loss: 0.0062227712256356935
+Epoch: 5 Idx: 5000 Loss: 0.014412310356500943
+Epoch: 6 Idx: 0 Loss: 0.008650333028996584
+Epoch: 6 Idx: 5000 Loss: 0.039695871788899544
+Epoch: 7 Idx: 0 Loss: 0.023417046380634545
+Epoch: 7 Idx: 5000 Loss: 0.02206131430360448
+Epoch: 8 Idx: 0 Loss: 0.008696387672520548
+Epoch: 8 Idx: 5000 Loss: 0.03706246587064414
+Epoch: 9 Idx: 0 Loss: 0.014100121091118294
+Epoch: 9 Idx: 5000 Loss: 0.015539836830075189
+Epoch: 10 Idx: 0 Loss: 0.009835672395227812
+Epoch: 10 Idx: 5000 Loss: 0.010539968028679052
+Epoch: 11 Idx: 0 Loss: 0.015281182179031207
+Epoch: 11 Idx: 5000 Loss: 0.02643623400390162
+Epoch: 12 Idx: 0 Loss: 0.010398702268060212
+Epoch: 12 Idx: 5000 Loss: 0.013296554748729565
+Epoch: 13 Idx: 0 Loss: 0.011153441126197662
+Epoch: 13 Idx: 5000 Loss: 0.01725911402967317
+Epoch: 14 Idx: 0 Loss: 0.03888043728444105
+Epoch: 14 Idx: 5000 Loss: 0.020934191191518674
+Epoch: 15 Idx: 0 Loss: 0.021924504390422577
+Epoch: 15 Idx: 5000 Loss: 0.02445664185770402
+Epoch: 16 Idx: 0 Loss: 0.01193870520351906
+Epoch: 16 Idx: 5000 Loss: 0.007334803359185185
+Epoch: 17 Idx: 0 Loss: 0.014291679296664313
+Epoch: 17 Idx: 5000 Loss: 0.07795941184049013
+Epoch: 18 Idx: 0 Loss: 0.01631191605749216
+Epoch: 18 Idx: 5000 Loss: 0.011923509028830142
+Epoch: 19 Idx: 0 Loss: 0.010137798890136211
+Epoch: 19 Idx: 5000 Loss: 0.009175365923411475
+Epoch: 20 Idx: 0 Loss: 0.026001952676593915
+Epoch: 20 Idx: 5000 Loss: 0.007454324257127059
+Epoch: 21 Idx: 0 Loss: 0.027740814895741216
+Epoch: 21 Idx: 5000 Loss: 0.019269813073157394
+Epoch: 22 Idx: 0 Loss: 0.007990934151517496
+Epoch: 22 Idx: 5000 Loss: 0.007776104344997913
+Epoch: 23 Idx: 0 Loss: 0.008038162419698944
+Epoch: 23 Idx: 5000 Loss: 0.013713755915711431
+Epoch: 24 Idx: 0 Loss: 0.02215563658665242
+Epoch: 24 Idx: 5000 Loss: 0.029785269269124535
+Epoch: 25 Idx: 0 Loss: 0.01293742284800154
+Epoch: 25 Idx: 5000 Loss: 0.012883011163108561
+Epoch: 26 Idx: 0 Loss: 0.03406551686002354
+Epoch: 26 Idx: 5000 Loss: 0.012609760129047071
+Epoch: 27 Idx: 0 Loss: 0.009874492173857788
+Epoch: 27 Idx: 5000 Loss: 0.008894061722135459
+Epoch: 28 Idx: 0 Loss: 0.014555025233591184
+Epoch: 28 Idx: 5000 Loss: 0.015681721532180105
+Epoch: 29 Idx: 0 Loss: 0.010286026379590217
+Epoch: 29 Idx: 5000 Loss: 0.012033503994509058
+Epoch: 30 Idx: 0 Loss: 0.011111208869527947
+Epoch: 30 Idx: 5000 Loss: 0.013461782814164013
+Epoch: 31 Idx: 0 Loss: 0.019181424609771125
+Epoch: 31 Idx: 5000 Loss: 0.00675784553026991
+Epoch: 32 Idx: 0 Loss: 0.007070341017908489
+Epoch: 32 Idx: 5000 Loss: 0.03012525965125019
+Epoch: 33 Idx: 0 Loss: 0.01697015722555016
+Epoch: 33 Idx: 5000 Loss: 0.017734013499883426
+Epoch: 34 Idx: 0 Loss: 0.011761192083351597
+Epoch: 34 Idx: 5000 Loss: 0.020527338070535063
+Epoch: 35 Idx: 0 Loss: 0.02327480730013615
+Epoch: 35 Idx: 5000 Loss: 0.017363858178966254
+Epoch: 36 Idx: 0 Loss: 0.015811591172143785
+Epoch: 36 Idx: 5000 Loss: 0.015284424325423405
+Epoch: 37 Idx: 0 Loss: 0.008142868798832494
+Epoch: 37 Idx: 5000 Loss: 0.015905182819898712
+Epoch: 38 Idx: 0 Loss: 0.00873386600637106
+Epoch: 38 Idx: 5000 Loss: 0.023459027581784104
+Epoch: 39 Idx: 0 Loss: 0.02445146357619768
+Epoch: 39 Idx: 5000 Loss: 0.011233956082749828
+Epoch: 40 Idx: 0 Loss: 0.01454527512163728
+Epoch: 40 Idx: 5000 Loss: 0.010142615264267187
+Epoch: 41 Idx: 0 Loss: 0.011569025989897822
+Epoch: 41 Idx: 5000 Loss: 0.014616071300538373
+Epoch: 42 Idx: 0 Loss: 0.015312954092563384
+Epoch: 42 Idx: 5000 Loss: 0.010389687979728916
+Epoch: 43 Idx: 0 Loss: 0.01104272101110931
+Epoch: 43 Idx: 5000 Loss: 0.024635073475748386
+Epoch: 44 Idx: 0 Loss: 0.018523331396439406
+Epoch: 44 Idx: 5000 Loss: 0.016488606313881868
+Epoch: 45 Idx: 0 Loss: 0.012488998944961506
+Epoch: 45 Idx: 5000 Loss: 0.010591426510429956
+Epoch: 46 Idx: 0 Loss: 0.007102337806546717
+Epoch: 46 Idx: 5000 Loss: 0.012312628590995165
+Epoch: 47 Idx: 0 Loss: 0.02150027456013066
+Epoch: 47 Idx: 5000 Loss: 0.015609911202129536
+Epoch: 48 Idx: 0 Loss: 0.013636377698328208
+Epoch: 48 Idx: 5000 Loss: 0.008299208321914543
+Epoch: 49 Idx: 0 Loss: 0.011559488612514435
+Epoch: 49 Idx: 5000 Loss: 0.01732766459682748
+Len (direct inputs):  2729
+Inputs len 3577 11 4127
 Len (direct inputs):  561
-Inputs len 1568 15 4130
-Len (direct inputs):  2577
 Starting sliding window evaluation...
-Step 6/7
-Val onto:  [('edas', 'sigkdd')] test_onto:  [('conference', 'edas')]
-Training size: 106045 Testing size: 7817
-Epoch: 0 Idx: 0 Loss: 0.22824212092037563
-Epoch: 0 Idx: 5000 Loss: 0.015586585309627893
-Epoch: 1 Idx: 0 Loss: 0.016017634087678208
-Epoch: 1 Idx: 5000 Loss: 0.019020607051542827
-Epoch: 2 Idx: 0 Loss: 0.007001948375499286
-Epoch: 2 Idx: 5000 Loss: 0.018905797785711356
-Epoch: 3 Idx: 0 Loss: 0.013824003448156638
-Epoch: 3 Idx: 5000 Loss: 0.009335987602646048
-Epoch: 4 Idx: 0 Loss: 0.027636765070088328
-Epoch: 4 Idx: 5000 Loss: 0.012775263043812109
-Epoch: 5 Idx: 0 Loss: 0.01545286958394587
-Epoch: 5 Idx: 5000 Loss: 0.010405845761670675
-Epoch: 6 Idx: 0 Loss: 0.031148274770355477
-Epoch: 6 Idx: 5000 Loss: 0.006178119013827428
-Epoch: 7 Idx: 0 Loss: 0.01229037145059884
-Epoch: 7 Idx: 5000 Loss: 0.01827570667899058
-Epoch: 8 Idx: 0 Loss: 0.02007164597225599
-Epoch: 8 Idx: 5000 Loss: 0.014204969062526211
-Epoch: 9 Idx: 0 Loss: 0.012842904088929224
-Epoch: 9 Idx: 5000 Loss: 0.008620174636471158
-Epoch: 10 Idx: 0 Loss: 0.01670619293189817
-Epoch: 10 Idx: 5000 Loss: 0.016880140113976202
-Epoch: 11 Idx: 0 Loss: 0.019860860902271252
-Epoch: 11 Idx: 5000 Loss: 0.011289202014998804
-Epoch: 12 Idx: 0 Loss: 0.019262419657818466
-Epoch: 12 Idx: 5000 Loss: 0.01888411469637321
-Epoch: 13 Idx: 0 Loss: 0.007140623894450607
-Epoch: 13 Idx: 5000 Loss: 0.015132754941517395
-Epoch: 14 Idx: 0 Loss: 0.014855632077118796
-Epoch: 14 Idx: 5000 Loss: 0.01645183122269912
-Epoch: 15 Idx: 0 Loss: 0.022251011253776896
-Epoch: 15 Idx: 5000 Loss: 0.009999333156868807
-Epoch: 16 Idx: 0 Loss: 0.01768031552877399
-Epoch: 16 Idx: 5000 Loss: 0.01490771472513064
-Epoch: 17 Idx: 0 Loss: 0.04040753613930685
-Epoch: 17 Idx: 5000 Loss: 0.009380271877917715
-Epoch: 18 Idx: 0 Loss: 0.021265756715829278
-Epoch: 18 Idx: 5000 Loss: 0.011445586426588321
-Epoch: 19 Idx: 0 Loss: 0.004748247263069639
-Epoch: 19 Idx: 5000 Loss: 0.03085304515269379
-Epoch: 20 Idx: 0 Loss: 0.026622655850498604
-Epoch: 20 Idx: 5000 Loss: 0.015875046492249845
-Epoch: 21 Idx: 0 Loss: 0.009151834986724913
-Epoch: 21 Idx: 5000 Loss: 0.00917907724477358
-Epoch: 22 Idx: 0 Loss: 0.005006825548650486
-Epoch: 22 Idx: 5000 Loss: 0.025884345655778275
-Epoch: 23 Idx: 0 Loss: 0.013609581951838003
-Epoch: 23 Idx: 5000 Loss: 0.02970640395511414
-Epoch: 24 Idx: 0 Loss: 0.011760224038675084
-Epoch: 24 Idx: 5000 Loss: 0.009132353757426399
-Epoch: 25 Idx: 0 Loss: 0.014537287085515983
-Epoch: 25 Idx: 5000 Loss: 0.010640123827321137
-Epoch: 26 Idx: 0 Loss: 0.01070097827676968
-Epoch: 26 Idx: 5000 Loss: 0.018475834813730885
-Epoch: 27 Idx: 0 Loss: 0.012948155797505145
-Epoch: 27 Idx: 5000 Loss: 0.013109390242611053
-Epoch: 28 Idx: 0 Loss: 0.011187103840717822
-Epoch: 28 Idx: 5000 Loss: 0.006609671316399063
-Epoch: 29 Idx: 0 Loss: 0.005989126273838133
-Epoch: 29 Idx: 5000 Loss: 0.015208678488219152
-Epoch: 30 Idx: 0 Loss: 0.011858247476953482
-Epoch: 30 Idx: 5000 Loss: 0.026822300470220467
-Epoch: 31 Idx: 0 Loss: 0.011383063663653225
-Epoch: 31 Idx: 5000 Loss: 0.008116550169343725
-Epoch: 32 Idx: 0 Loss: 0.01473412332286471
-Epoch: 32 Idx: 5000 Loss: 0.019924855503484364
-Epoch: 33 Idx: 0 Loss: 0.03112118288512479
-Epoch: 33 Idx: 5000 Loss: 0.023858246516213617
-Epoch: 34 Idx: 0 Loss: 0.008044072989978108
-Epoch: 34 Idx: 5000 Loss: 0.015759399414067756
-Epoch: 35 Idx: 0 Loss: 0.007204823296211475
-Epoch: 35 Idx: 5000 Loss: 0.016463218809567196
-Epoch: 36 Idx: 0 Loss: 0.023569408058145506
-Epoch: 36 Idx: 5000 Loss: 0.007428412461594149
-Epoch: 37 Idx: 0 Loss: 0.010524851064154385
-Epoch: 37 Idx: 5000 Loss: 0.010299676009777497
-Epoch: 38 Idx: 0 Loss: 0.032160424364846424
-Epoch: 38 Idx: 5000 Loss: 0.007816618272730181
-Epoch: 39 Idx: 0 Loss: 0.011528233576847175
-Epoch: 39 Idx: 5000 Loss: 0.014326086685874078
-Epoch: 40 Idx: 0 Loss: 0.027631093948288332
-Epoch: 40 Idx: 5000 Loss: 0.033843235502320615
-Epoch: 41 Idx: 0 Loss: 0.04899826186027372
-Epoch: 41 Idx: 5000 Loss: 0.015337323095500056
-Epoch: 42 Idx: 0 Loss: 0.012735712308181879
-Epoch: 42 Idx: 5000 Loss: 0.007714573558879154
-Epoch: 43 Idx: 0 Loss: 0.02665408154022348
-Epoch: 43 Idx: 5000 Loss: 0.01793632435173438
-Epoch: 44 Idx: 0 Loss: 0.014369330313922775
-Epoch: 44 Idx: 5000 Loss: 0.031481187518195536
-Epoch: 45 Idx: 0 Loss: 0.026118520599400834
-Epoch: 45 Idx: 5000 Loss: 0.02139154459543087
-Epoch: 46 Idx: 0 Loss: 0.01673982319423662
-Epoch: 46 Idx: 5000 Loss: 0.018092151897837944
-Epoch: 47 Idx: 0 Loss: 0.013768176608871389
-Epoch: 47 Idx: 5000 Loss: 0.022690930105348665
-Epoch: 48 Idx: 0 Loss: 0.014875253130600601
-Epoch: 48 Idx: 5000 Loss: 0.016358665359819686
-Epoch: 49 Idx: 0 Loss: 0.008751710874134807
-Epoch: 49 Idx: 5000 Loss: 0.018823403676423732
-Len (direct inputs):  877
+Step 2.0/7
+Val onto:  [('cmt', 'conference'), ('edas', 'sigkdd')] test_onto:  [('conference', 'edas')]
+Training size: 105154 Testing size: 7817
+Epoch: 0 Idx: 0 Loss: 0.1837181894666099
+Epoch: 0 Idx: 5000 Loss: 0.017192973234976927
+Epoch: 1 Idx: 0 Loss: 0.010985076671301656
+Epoch: 1 Idx: 5000 Loss: 0.023185922603114157
+Epoch: 2 Idx: 0 Loss: 0.0062955830688214455
+Epoch: 2 Idx: 5000 Loss: 0.016693477261395168
+Epoch: 3 Idx: 0 Loss: 0.04937587854521368
+Epoch: 3 Idx: 5000 Loss: 0.012856537818841524
+Epoch: 4 Idx: 0 Loss: 0.011036201380827278
+Epoch: 4 Idx: 5000 Loss: 0.011312265967698262
+Epoch: 5 Idx: 0 Loss: 0.012606026961868477
+Epoch: 5 Idx: 5000 Loss: 0.01178735042231378
+Epoch: 6 Idx: 0 Loss: 0.011563547225468386
+Epoch: 6 Idx: 5000 Loss: 0.019966707510700246
+Epoch: 7 Idx: 0 Loss: 0.027526627151292983
+Epoch: 7 Idx: 5000 Loss: 0.011420388859598432
+Epoch: 8 Idx: 0 Loss: 0.039109274743858904
+Epoch: 8 Idx: 5000 Loss: 0.031538546458441494
+Epoch: 9 Idx: 0 Loss: 0.010376067319783275
+Epoch: 9 Idx: 5000 Loss: 0.005789978576996243
+Epoch: 10 Idx: 0 Loss: 0.03323497525576926
+Epoch: 10 Idx: 5000 Loss: 0.038511598419753344
+Epoch: 11 Idx: 0 Loss: 0.011546120791355946
+Epoch: 11 Idx: 5000 Loss: 0.025446278296527666
+Epoch: 12 Idx: 0 Loss: 0.008541025316139327
+Epoch: 12 Idx: 5000 Loss: 0.01539976265874641
+Epoch: 13 Idx: 0 Loss: 0.014831897888574747
+Epoch: 13 Idx: 5000 Loss: 0.008931539358887805
+Epoch: 14 Idx: 0 Loss: 0.03128931384638076
+Epoch: 14 Idx: 5000 Loss: 0.019442565130445795
+Epoch: 15 Idx: 0 Loss: 0.008211366019157422
+Epoch: 15 Idx: 5000 Loss: 0.006286645541503374
+Epoch: 16 Idx: 0 Loss: 0.011264031903737488
+Epoch: 16 Idx: 5000 Loss: 0.020609301927453905
+Epoch: 17 Idx: 0 Loss: 0.015440553731007955
+Epoch: 17 Idx: 5000 Loss: 0.005678361270849166
+Epoch: 18 Idx: 0 Loss: 0.036581523536248044
+Epoch: 18 Idx: 5000 Loss: 0.02596656144500025
+Epoch: 19 Idx: 0 Loss: 0.01033368645998948
+Epoch: 19 Idx: 5000 Loss: 0.020640339449411342
+Epoch: 20 Idx: 0 Loss: 0.018023532510138104
+Epoch: 20 Idx: 5000 Loss: 0.011405280634858935
+Epoch: 21 Idx: 0 Loss: 0.016756533242981955
+Epoch: 21 Idx: 5000 Loss: 0.006132955983919152
+Epoch: 22 Idx: 0 Loss: 0.012406820198854812
+Epoch: 22 Idx: 5000 Loss: 0.012307700723569414
+Epoch: 23 Idx: 0 Loss: 0.008208177946926276
+Epoch: 23 Idx: 5000 Loss: 0.028327629693492992
+Epoch: 24 Idx: 0 Loss: 0.029327135650503988
+Epoch: 24 Idx: 5000 Loss: 0.015959549399122516
+Epoch: 25 Idx: 0 Loss: 0.013182916937102442
+Epoch: 25 Idx: 5000 Loss: 0.012898031086856108
+Epoch: 26 Idx: 0 Loss: 0.022626254801938868
+Epoch: 26 Idx: 5000 Loss: 0.01577683646320163
+Epoch: 27 Idx: 0 Loss: 0.019688409187940483
+Epoch: 27 Idx: 5000 Loss: 0.01489100676324812
+Epoch: 28 Idx: 0 Loss: 0.018738019902694004
+Epoch: 28 Idx: 5000 Loss: 0.015834233525491053
+Epoch: 29 Idx: 0 Loss: 0.012487807849393677
+Epoch: 29 Idx: 5000 Loss: 0.008476962751010871
+Epoch: 30 Idx: 0 Loss: 0.022203942662073047
+Epoch: 30 Idx: 5000 Loss: 0.03826735382113873
+Epoch: 31 Idx: 0 Loss: 0.007906945978449265
+Epoch: 31 Idx: 5000 Loss: 0.008089277720919105
+Epoch: 32 Idx: 0 Loss: 0.014005409887198693
+Epoch: 32 Idx: 5000 Loss: 0.023608304391234996
+Epoch: 33 Idx: 0 Loss: 0.008956309628005582
+Epoch: 33 Idx: 5000 Loss: 0.01208620722653909
+Epoch: 34 Idx: 0 Loss: 0.008878857973788151
+Epoch: 34 Idx: 5000 Loss: 0.022702761567564796
+Epoch: 35 Idx: 0 Loss: 0.015583453175089055
+Epoch: 35 Idx: 5000 Loss: 0.014529189270081297
+Epoch: 36 Idx: 0 Loss: 0.018759884373410203
+Epoch: 36 Idx: 5000 Loss: 0.014826168893461299
+Epoch: 37 Idx: 0 Loss: 0.0057913211007713135
+Epoch: 37 Idx: 5000 Loss: 0.03034579868947656
+Epoch: 38 Idx: 0 Loss: 0.007400397307118167
+Epoch: 38 Idx: 5000 Loss: 0.008753922232622374
+Epoch: 39 Idx: 0 Loss: 0.0143086124841021
+Epoch: 39 Idx: 5000 Loss: 0.034846577221414245
+Epoch: 40 Idx: 0 Loss: 0.019029081176766424
+Epoch: 40 Idx: 5000 Loss: 0.028067063822724087
+Epoch: 41 Idx: 0 Loss: 0.010557650997097493
+Epoch: 41 Idx: 5000 Loss: 0.00958881588564307
+Epoch: 42 Idx: 0 Loss: 0.03792737561048015
+Epoch: 42 Idx: 5000 Loss: 0.009923521337635164
+Epoch: 43 Idx: 0 Loss: 0.016357630216811945
+Epoch: 43 Idx: 5000 Loss: 0.019184087747125902
+Epoch: 44 Idx: 0 Loss: 0.009797793572946134
+Epoch: 44 Idx: 5000 Loss: 0.017814125008760222
+Epoch: 45 Idx: 0 Loss: 0.013258459760689277
+Epoch: 45 Idx: 5000 Loss: 0.006096991426187562
+Epoch: 46 Idx: 0 Loss: 0.010141520738898607
+Epoch: 46 Idx: 5000 Loss: 0.012905825985160454
+Epoch: 47 Idx: 0 Loss: 0.008002144318069752
+Epoch: 47 Idx: 5000 Loss: 0.007759998959046423
+Epoch: 48 Idx: 0 Loss: 0.03096048891818467
+Epoch: 48 Idx: 5000 Loss: 0.023315944468416894
+Epoch: 49 Idx: 0 Loss: 0.010116320231274237
+Epoch: 49 Idx: 5000 Loss: 0.029764076470912025
+Len (direct inputs):  3454
 Inputs len 5600 17 7800
 Len (direct inputs):  2217
 Starting sliding window evaluation...
-Step 8/7
-Val onto:  [('cmt', 'iasted')] test_onto:  [('confof', 'sigkdd')]
-Training size: 111351 Testing size: 2336
-Epoch: 0 Idx: 0 Loss: 0.2033495602575748
-Epoch: 0 Idx: 5000 Loss: 0.013170859769999821
-Epoch: 1 Idx: 0 Loss: 0.00837385216951443
-Epoch: 1 Idx: 5000 Loss: 0.010534075565362507
-Epoch: 2 Idx: 0 Loss: 0.00841940905879563
-Epoch: 2 Idx: 5000 Loss: 0.00816387322272135
-Epoch: 3 Idx: 0 Loss: 0.020349704817032792
-Epoch: 3 Idx: 5000 Loss: 0.005938112853113523
-Epoch: 4 Idx: 0 Loss: 0.026763587689542814
-Epoch: 4 Idx: 5000 Loss: 0.01117695061337036
-Epoch: 5 Idx: 0 Loss: 0.006838927845161897
-Epoch: 5 Idx: 5000 Loss: 0.019363885475827874
-Epoch: 6 Idx: 0 Loss: 0.009699731568478082
-Epoch: 6 Idx: 5000 Loss: 0.016471781183496466
-Epoch: 7 Idx: 0 Loss: 0.0381421394991317
-Epoch: 7 Idx: 5000 Loss: 0.013977757306477472
-Epoch: 8 Idx: 0 Loss: 0.03960646357383388
-Epoch: 8 Idx: 5000 Loss: 0.015289877899412444
-Epoch: 9 Idx: 0 Loss: 0.005393789336288374
-Epoch: 9 Idx: 5000 Loss: 0.009493505834358566
-Epoch: 10 Idx: 0 Loss: 0.044380034331204236
-Epoch: 10 Idx: 5000 Loss: 0.017846818763500652
-Epoch: 11 Idx: 0 Loss: 0.014670644662271325
-Epoch: 11 Idx: 5000 Loss: 0.01716217425160389
-Epoch: 12 Idx: 0 Loss: 0.010904224825161431
-Epoch: 12 Idx: 5000 Loss: 0.025159459558906347
-Epoch: 13 Idx: 0 Loss: 0.012948752101948506
-Epoch: 13 Idx: 5000 Loss: 0.009882040490395632
-Epoch: 14 Idx: 0 Loss: 0.014365881457263632
-Epoch: 14 Idx: 5000 Loss: 0.012141366772795897
-Epoch: 15 Idx: 0 Loss: 0.014714945227106159
-Epoch: 15 Idx: 5000 Loss: 0.012218446831201655
-Epoch: 16 Idx: 0 Loss: 0.0189026844748402
-Epoch: 16 Idx: 5000 Loss: 0.014203037130340554
-Epoch: 17 Idx: 0 Loss: 0.01154369916969283
-Epoch: 17 Idx: 5000 Loss: 0.007808929781345574
-Epoch: 18 Idx: 0 Loss: 0.011435209038799424
-Epoch: 18 Idx: 5000 Loss: 0.03244901896391129
-Epoch: 19 Idx: 0 Loss: 0.014423295387490511
-Epoch: 19 Idx: 5000 Loss: 0.02692015829426571
-Epoch: 20 Idx: 0 Loss: 0.011426949163681591
-Epoch: 20 Idx: 5000 Loss: 0.012368946410994171
-Epoch: 21 Idx: 0 Loss: 0.02375457074279653
-Epoch: 21 Idx: 5000 Loss: 0.023158991799876596
-Epoch: 22 Idx: 0 Loss: 0.008727465318788909
-Epoch: 22 Idx: 5000 Loss: 0.02655433055663154
-Epoch: 23 Idx: 0 Loss: 0.021804744814527995
-Epoch: 23 Idx: 5000 Loss: 0.015673712705850645
-Epoch: 24 Idx: 0 Loss: 0.011705267226902807
-Epoch: 24 Idx: 5000 Loss: 0.012123557068220676
-Epoch: 25 Idx: 0 Loss: 0.008995076018894887
-Epoch: 25 Idx: 5000 Loss: 0.008765410648007635
-Epoch: 26 Idx: 0 Loss: 0.022839715574946042
-Epoch: 26 Idx: 5000 Loss: 0.027678789716786376
-Epoch: 27 Idx: 0 Loss: 0.01841300617308887
-Epoch: 27 Idx: 5000 Loss: 0.018854281649093096
-Epoch: 28 Idx: 0 Loss: 0.010260543714271512
-Epoch: 28 Idx: 5000 Loss: 0.016907918842662933
-Epoch: 29 Idx: 0 Loss: 0.03222465042882358
-Epoch: 29 Idx: 5000 Loss: 0.013014056975893022
-Epoch: 30 Idx: 0 Loss: 0.02792218179610453
-Epoch: 30 Idx: 5000 Loss: 0.022358185676822257
-Epoch: 31 Idx: 0 Loss: 0.015295341419563489
-Epoch: 31 Idx: 5000 Loss: 0.03114488401142028
-Epoch: 32 Idx: 0 Loss: 0.006730379103880885
-Epoch: 32 Idx: 5000 Loss: 0.014817294511640345
-Epoch: 33 Idx: 0 Loss: 0.011402674303211333
-Epoch: 33 Idx: 5000 Loss: 0.008990714005444142
-Epoch: 34 Idx: 0 Loss: 0.01795621563228911
-Epoch: 34 Idx: 5000 Loss: 0.023812931236573947
-Epoch: 35 Idx: 0 Loss: 0.03397509126855604
-Epoch: 35 Idx: 5000 Loss: 0.019975222364384815
-Epoch: 36 Idx: 0 Loss: 0.020456340609450528
-Epoch: 36 Idx: 5000 Loss: 0.012675473768940567
-Epoch: 37 Idx: 0 Loss: 0.02319115796353367
-Epoch: 37 Idx: 5000 Loss: 0.006597705280102972
-Epoch: 38 Idx: 0 Loss: 0.022576911003564827
-Epoch: 38 Idx: 5000 Loss: 0.011639548664195474
-Epoch: 39 Idx: 0 Loss: 0.015909010689479072
-Epoch: 39 Idx: 5000 Loss: 0.011533252553075364
-Epoch: 40 Idx: 0 Loss: 0.027616095979288904
-Epoch: 40 Idx: 5000 Loss: 0.008195598715681094
-Epoch: 41 Idx: 0 Loss: 0.028931598080626567
-Epoch: 41 Idx: 5000 Loss: 0.010455336442166844
-Epoch: 42 Idx: 0 Loss: 0.009254620307279535
-Epoch: 42 Idx: 5000 Loss: 0.016276464409625113
-Epoch: 43 Idx: 0 Loss: 0.027193827501243897
-Epoch: 43 Idx: 5000 Loss: 0.00639675904770694
-Epoch: 44 Idx: 0 Loss: 0.03404469918620755
-Epoch: 44 Idx: 5000 Loss: 0.050437873197016
-Epoch: 45 Idx: 0 Loss: 0.029041064703893477
-Epoch: 45 Idx: 5000 Loss: 0.006795044173644262
-Epoch: 46 Idx: 0 Loss: 0.012898898593237325
-Epoch: 46 Idx: 5000 Loss: 0.02169224394151159
-Epoch: 47 Idx: 0 Loss: 0.016553473148757856
-Epoch: 47 Idx: 5000 Loss: 0.020036634320878068
-Epoch: 48 Idx: 0 Loss: 0.014143566844327882
-Epoch: 48 Idx: 5000 Loss: 0.011385923624292967
-Epoch: 49 Idx: 0 Loss: 0.01792924457118545
-Epoch: 49 Idx: 5000 Loss: 0.013874063714090737
-Len (direct inputs):  2088
-Inputs len 1862 7 2329
-Len (direct inputs):  474
+Step 3.0/7
+Val onto:  [('cmt', 'iasted'), ('confOf', 'sigkdd')] test_onto:  [('cmt', 'ekaw')]
+Training size: 110871 Testing size: 3734
+Epoch: 0 Idx: 0 Loss: 0.20314932881334383
+Epoch: 0 Idx: 5000 Loss: 0.023721366951661313
+Epoch: 1 Idx: 0 Loss: 0.02287039094788664
+Epoch: 1 Idx: 5000 Loss: 0.014449157435477804
+Epoch: 2 Idx: 0 Loss: 0.023446123479946568
+Epoch: 2 Idx: 5000 Loss: 0.00898677609678646
+Epoch: 3 Idx: 0 Loss: 0.017167909578728914
+Epoch: 3 Idx: 5000 Loss: 0.010301967375321073
+Epoch: 4 Idx: 0 Loss: 0.009974053918013204
+Epoch: 4 Idx: 5000 Loss: 0.008112804507423518
+Epoch: 5 Idx: 0 Loss: 0.028770096223086718
+Epoch: 5 Idx: 5000 Loss: 0.012308016784034592
+Epoch: 6 Idx: 0 Loss: 0.03234407573295635
+Epoch: 6 Idx: 5000 Loss: 0.02118187200363831
+Epoch: 7 Idx: 0 Loss: 0.02508360738294815
+Epoch: 7 Idx: 5000 Loss: 0.007701011460557356
+Epoch: 8 Idx: 0 Loss: 0.010248351453880838
+Epoch: 8 Idx: 5000 Loss: 0.014100460062952014
+Epoch: 9 Idx: 0 Loss: 0.018223996312315038
+Epoch: 9 Idx: 5000 Loss: 0.016679292105592988
+Epoch: 10 Idx: 0 Loss: 0.011589053129588533
+Epoch: 10 Idx: 5000 Loss: 0.006716467883824453
+Epoch: 11 Idx: 0 Loss: 0.017173625250349545
+Epoch: 11 Idx: 5000 Loss: 0.03848439161674209
+Epoch: 12 Idx: 0 Loss: 0.011115752333997805
+Epoch: 12 Idx: 5000 Loss: 0.03018827905365308
+Epoch: 13 Idx: 0 Loss: 0.009492834983099155
+Epoch: 13 Idx: 5000 Loss: 0.020363271055472386
+Epoch: 14 Idx: 0 Loss: 0.007024870716159336
+Epoch: 14 Idx: 5000 Loss: 0.009856968367044238
+Epoch: 15 Idx: 0 Loss: 0.012847038163827755
+Epoch: 15 Idx: 5000 Loss: 0.025972236679579017
+Epoch: 16 Idx: 0 Loss: 0.013616217199842014
+Epoch: 16 Idx: 5000 Loss: 0.03909762968544921
+Epoch: 17 Idx: 0 Loss: 0.030001799984308637
+Epoch: 17 Idx: 5000 Loss: 0.022134501727265603
+Epoch: 18 Idx: 0 Loss: 0.009601845362493127
+Epoch: 18 Idx: 5000 Loss: 0.03182541774187041
+Epoch: 19 Idx: 0 Loss: 0.0217881174063332
+Epoch: 19 Idx: 5000 Loss: 0.015327067419706986
+Epoch: 20 Idx: 0 Loss: 0.006994358851101579
+Epoch: 20 Idx: 5000 Loss: 0.013340026719331911
+Epoch: 21 Idx: 0 Loss: 0.020443189476388422
+Epoch: 21 Idx: 5000 Loss: 0.013215355651794462
+Epoch: 22 Idx: 0 Loss: 0.01800457443227788
+Epoch: 22 Idx: 5000 Loss: 0.02626170837532043
+Epoch: 23 Idx: 0 Loss: 0.012924657214462421
+Epoch: 23 Idx: 5000 Loss: 0.010235795411207687
+Epoch: 24 Idx: 0 Loss: 0.013939744158739328
+Epoch: 24 Idx: 5000 Loss: 0.018938918845671636
+Epoch: 25 Idx: 0 Loss: 0.007001411323856573
+Epoch: 25 Idx: 5000 Loss: 0.003829195010284572
+Epoch: 26 Idx: 0 Loss: 0.007236442325935767
+Epoch: 26 Idx: 5000 Loss: 0.03794970315119823
+Epoch: 27 Idx: 0 Loss: 0.014989467304477491
+Epoch: 27 Idx: 5000 Loss: 0.014116521908944224
+Epoch: 28 Idx: 0 Loss: 0.04655676462516517
+Epoch: 28 Idx: 5000 Loss: 0.009750440226987539
+Epoch: 29 Idx: 0 Loss: 0.02245463269008819
+Epoch: 29 Idx: 5000 Loss: 0.009743610900531035
+Epoch: 30 Idx: 0 Loss: 0.018030665996256898
+Epoch: 30 Idx: 5000 Loss: 0.028025550701338556
+Epoch: 31 Idx: 0 Loss: 0.014117229883143945
+Epoch: 31 Idx: 5000 Loss: 0.042037781484521426
+Epoch: 32 Idx: 0 Loss: 0.00506989113213363
+Epoch: 32 Idx: 5000 Loss: 0.02105550092697067
+Epoch: 33 Idx: 0 Loss: 0.013308650718607342
+Epoch: 33 Idx: 5000 Loss: 0.021319392530630747
+Epoch: 34 Idx: 0 Loss: 0.012933032432719335
+Epoch: 34 Idx: 5000 Loss: 0.027632347031829617
+Epoch: 35 Idx: 0 Loss: 0.01009535029956321
+Epoch: 35 Idx: 5000 Loss: 0.012232596834791463
+Epoch: 36 Idx: 0 Loss: 0.009362113990237377
+Epoch: 36 Idx: 5000 Loss: 0.011937942421603231
+Epoch: 37 Idx: 0 Loss: 0.012636525373918048
+Epoch: 37 Idx: 5000 Loss: 0.03361098034182518
+Epoch: 38 Idx: 0 Loss: 0.017872790258789753
+Epoch: 38 Idx: 5000 Loss: 0.007798465581508851
+Epoch: 39 Idx: 0 Loss: 0.022903452694658738
+Epoch: 39 Idx: 5000 Loss: 0.039904810417989954
+Epoch: 40 Idx: 0 Loss: 0.03559756593508202
+Epoch: 40 Idx: 5000 Loss: 0.011794529919561446
+Epoch: 41 Idx: 0 Loss: 0.010082017680782502
+Epoch: 41 Idx: 5000 Loss: 0.02176383637392871
+Epoch: 42 Idx: 0 Loss: 0.009171034383984682
+Epoch: 42 Idx: 5000 Loss: 0.01636637273355713
+Epoch: 43 Idx: 0 Loss: 0.02283710968954309
+Epoch: 43 Idx: 5000 Loss: 0.011559638601589803
+Epoch: 44 Idx: 0 Loss: 0.025707343827107012
+Epoch: 44 Idx: 5000 Loss: 0.013074739253650106
+Epoch: 45 Idx: 0 Loss: 0.00905536472116689
+Epoch: 45 Idx: 5000 Loss: 0.017799440524813144
+Epoch: 46 Idx: 0 Loss: 0.015796758142188005
+Epoch: 46 Idx: 5000 Loss: 0.010393069696799737
+Epoch: 47 Idx: 0 Loss: 0.0213448119274057
+Epoch: 47 Idx: 5000 Loss: 0.02359738488259288
+Epoch: 48 Idx: 0 Loss: 0.01392514901332246
+Epoch: 48 Idx: 5000 Loss: 0.010571639729330475
+Epoch: 49 Idx: 0 Loss: 0.01204751203701989
+Epoch: 49 Idx: 5000 Loss: 0.012994675273511424
+Len (direct inputs):  2562
+Inputs len 2044 11 3723
+Len (direct inputs):  1690
 Starting sliding window evaluation...
-Step 10/7
-Val onto:  [('cmt', 'ekaw')] test_onto:  [('ekaw', 'iasted')]
-Training size: 104431 Testing size: 11474
-Epoch: 0 Idx: 0 Loss: 0.2070930845359439
-Epoch: 0 Idx: 5000 Loss: 0.00703839578525905
-Epoch: 1 Idx: 0 Loss: 0.02182668533785579
-Epoch: 1 Idx: 5000 Loss: 0.0122952682672112
-Epoch: 2 Idx: 0 Loss: 0.019576441397947106
-Epoch: 2 Idx: 5000 Loss: 0.00980804022199197
-Epoch: 3 Idx: 0 Loss: 0.008149377129859784
-Epoch: 3 Idx: 5000 Loss: 0.012122997239647125
-Epoch: 4 Idx: 0 Loss: 0.011085211637777995
-Epoch: 4 Idx: 5000 Loss: 0.017857585096183758
-Epoch: 5 Idx: 0 Loss: 0.01702221484609883
-Epoch: 5 Idx: 5000 Loss: 0.012895799610246356
-Epoch: 6 Idx: 0 Loss: 0.028703286163768854
-Epoch: 6 Idx: 5000 Loss: 0.016226592615505554
-Epoch: 7 Idx: 0 Loss: 0.006543333034342559
-Epoch: 7 Idx: 5000 Loss: 0.050993052990656755
-Epoch: 8 Idx: 0 Loss: 0.0052126916490219275
-Epoch: 8 Idx: 5000 Loss: 0.023016537365577145
-Epoch: 9 Idx: 0 Loss: 0.024801685743272094
-Epoch: 9 Idx: 5000 Loss: 0.008459006037406347
-Epoch: 10 Idx: 0 Loss: 0.00995187468632467
-Epoch: 10 Idx: 5000 Loss: 0.014964450467607141
-Epoch: 11 Idx: 0 Loss: 0.026465066096510573
-Epoch: 11 Idx: 5000 Loss: 0.010469821221077813
-Epoch: 12 Idx: 0 Loss: 0.023774378492979104
-Epoch: 12 Idx: 5000 Loss: 0.0344519193196152
-Epoch: 13 Idx: 0 Loss: 0.01734387507087016
-Epoch: 13 Idx: 5000 Loss: 0.013885339832660262
-Epoch: 14 Idx: 0 Loss: 0.0161109788149853
-Epoch: 14 Idx: 5000 Loss: 0.015214867988247475
-Epoch: 15 Idx: 0 Loss: 0.011027516643945853
-Epoch: 15 Idx: 5000 Loss: 0.027143606626071674
-Epoch: 16 Idx: 0 Loss: 0.008531079478847762
-Epoch: 16 Idx: 5000 Loss: 0.007468004038279554
-Epoch: 17 Idx: 0 Loss: 0.025622129159307665
-Epoch: 17 Idx: 5000 Loss: 0.0181968952408863
-Epoch: 18 Idx: 0 Loss: 0.024030483560537486
-Epoch: 18 Idx: 5000 Loss: 0.008680519179164223
-Epoch: 19 Idx: 0 Loss: 0.009228387228958874
-Epoch: 19 Idx: 5000 Loss: 0.01219960484879183
-Epoch: 20 Idx: 0 Loss: 0.009490921680535648
-Epoch: 20 Idx: 5000 Loss: 0.01847135144618403
-Epoch: 21 Idx: 0 Loss: 0.02006615102804133
-Epoch: 21 Idx: 5000 Loss: 0.014134863141828161
-Epoch: 22 Idx: 0 Loss: 0.02734737703470272
-Epoch: 22 Idx: 5000 Loss: 0.03987501317339104
-Epoch: 23 Idx: 0 Loss: 0.00817180192901447
-Epoch: 23 Idx: 5000 Loss: 0.017453713380327016
-Epoch: 24 Idx: 0 Loss: 0.01544064348255439
-Epoch: 24 Idx: 5000 Loss: 0.015982162632908484
-Epoch: 25 Idx: 0 Loss: 0.013599936226597883
-Epoch: 25 Idx: 5000 Loss: 0.009928324215019095
-Epoch: 26 Idx: 0 Loss: 0.030492491871662912
-Epoch: 26 Idx: 5000 Loss: 0.013998943133465707
-Epoch: 27 Idx: 0 Loss: 0.015730573041087777
-Epoch: 27 Idx: 5000 Loss: 0.011348686160359327
-Epoch: 28 Idx: 0 Loss: 0.011774928743089181
-Epoch: 28 Idx: 5000 Loss: 0.01803555388016509
-Epoch: 29 Idx: 0 Loss: 0.009652033791883424
-Epoch: 29 Idx: 5000 Loss: 0.014100876388592394
-Epoch: 30 Idx: 0 Loss: 0.013460508108323591
-Epoch: 30 Idx: 5000 Loss: 0.015095319699837611
-Epoch: 31 Idx: 0 Loss: 0.009828596577877333
-Epoch: 31 Idx: 5000 Loss: 0.011033236799930717
-Epoch: 32 Idx: 0 Loss: 0.00824628630944544
-Epoch: 32 Idx: 5000 Loss: 0.013374349725011484
-Epoch: 33 Idx: 0 Loss: 0.007661658372213135
-Epoch: 33 Idx: 5000 Loss: 0.012111421649826886
-Epoch: 34 Idx: 0 Loss: 0.010621011818526958
-Epoch: 34 Idx: 5000 Loss: 0.012717510651057435
-Epoch: 35 Idx: 0 Loss: 0.009773161201219368
-Epoch: 35 Idx: 5000 Loss: 0.022045280617330257
-Epoch: 36 Idx: 0 Loss: 0.013693530210935174
-Epoch: 36 Idx: 5000 Loss: 0.005741618200232372
-Epoch: 37 Idx: 0 Loss: 0.00817198036852347
-Epoch: 37 Idx: 5000 Loss: 0.008930195380236716
-Epoch: 38 Idx: 0 Loss: 0.008069945137624764
-Epoch: 38 Idx: 5000 Loss: 0.009826514813343259
-Epoch: 39 Idx: 0 Loss: 0.011324793193961229
-Epoch: 39 Idx: 5000 Loss: 0.006475290809654224
-Epoch: 40 Idx: 0 Loss: 0.022443524114530704
-Epoch: 40 Idx: 5000 Loss: 0.00651240337232542
-Epoch: 41 Idx: 0 Loss: 0.013666946367787026
-Epoch: 41 Idx: 5000 Loss: 0.0074544029813711655
-Epoch: 42 Idx: 0 Loss: 0.010120342817461405
-Epoch: 42 Idx: 5000 Loss: 0.013105374068276858
-Epoch: 43 Idx: 0 Loss: 0.012848336902938497
-Epoch: 43 Idx: 5000 Loss: 0.010028489846652156
-Epoch: 44 Idx: 0 Loss: 0.011956490693185664
-Epoch: 44 Idx: 5000 Loss: 0.007926737192561406
-Epoch: 45 Idx: 0 Loss: 0.010513740714613293
-Epoch: 45 Idx: 5000 Loss: 0.025390478888868397
-Epoch: 46 Idx: 0 Loss: 0.022416273243192605
-Epoch: 46 Idx: 5000 Loss: 0.009943571701865862
-Epoch: 47 Idx: 0 Loss: 0.011056942274491575
-Epoch: 47 Idx: 5000 Loss: 0.009373208834410996
-Epoch: 48 Idx: 0 Loss: 0.016610894538947815
-Epoch: 48 Idx: 5000 Loss: 0.013578180197291977
-Epoch: 49 Idx: 0 Loss: 0.011320311835614603
+Step 4.0/7
+Val onto:  [('ekaw', 'iasted'), ('conference', 'iasted')] test_onto:  [('confOf', 'edas')]
+Training size: 96593 Testing size: 4764
+Epoch: 0 Idx: 0 Loss: 0.21447465007175764
+Epoch: 1 Idx: 0 Loss: 0.013960242880809718
+Epoch: 2 Idx: 0 Loss: 0.0173010811375821
+Epoch: 3 Idx: 0 Loss: 0.01949924220443197
+Epoch: 4 Idx: 0 Loss: 0.0427888049685565
+Epoch: 5 Idx: 0 Loss: 0.016044835737835356
+Epoch: 6 Idx: 0 Loss: 0.034623368528203614
+Epoch: 7 Idx: 0 Loss: 0.00754804142274063
+Epoch: 8 Idx: 0 Loss: 0.014437822453896085
+Epoch: 9 Idx: 0 Loss: 0.009235190863327
+Epoch: 10 Idx: 0 Loss: 0.018087776562225103
+Epoch: 11 Idx: 0 Loss: 0.01264521117448593
+Epoch: 12 Idx: 0 Loss: 0.02400046890152185
+Epoch: 13 Idx: 0 Loss: 0.0070030279685071774
+Epoch: 14 Idx: 0 Loss: 0.013163709363342532
+Epoch: 15 Idx: 0 Loss: 0.014857115676280038
+Epoch: 16 Idx: 0 Loss: 0.013730346975309952
+Epoch: 17 Idx: 0 Loss: 0.008708390930979203
+Epoch: 18 Idx: 0 Loss: 0.009545414644363131
+Epoch: 19 Idx: 0 Loss: 0.012123303018130593
+Epoch: 20 Idx: 0 Loss: 0.009395680838476002
+Epoch: 21 Idx: 0 Loss: 0.0073468608765229725
+Epoch: 22 Idx: 0 Loss: 0.03319161372177731
+Epoch: 23 Idx: 0 Loss: 0.026718029750515127
+Epoch: 24 Idx: 0 Loss: 0.03455479779611422
+Epoch: 25 Idx: 0 Loss: 0.0136910363764911
+Epoch: 26 Idx: 0 Loss: 0.012716586306096588
+Epoch: 27 Idx: 0 Loss: 0.012482884778888512
+Epoch: 28 Idx: 0 Loss: 0.011325694572713717
+Epoch: 29 Idx: 0 Loss: 0.012521474279511247
+Epoch: 30 Idx: 0 Loss: 0.009472862274106281
+Epoch: 31 Idx: 0 Loss: 0.008032806135831358
+Epoch: 32 Idx: 0 Loss: 0.021385781681627053
+Epoch: 33 Idx: 0 Loss: 0.024292819187157796
+Epoch: 34 Idx: 0 Loss: 0.008786285645590803
+Epoch: 35 Idx: 0 Loss: 0.007048121490775982
+Epoch: 36 Idx: 0 Loss: 0.013860998818725448
+Epoch: 37 Idx: 0 Loss: 0.0242560897611329
+Epoch: 38 Idx: 0 Loss: 0.009460796345761566
+Epoch: 39 Idx: 0 Loss: 0.01490070806928517
+Epoch: 40 Idx: 0 Loss: 0.017988890033229475
+Epoch: 41 Idx: 0 Loss: 0.017056344974280456
+Epoch: 42 Idx: 0 Loss: 0.013350175200601912
+Epoch: 43 Idx: 0 Loss: 0.037820417177711965
+Epoch: 44 Idx: 0 Loss: 0.007166878697425459
+Epoch: 45 Idx: 0 Loss: 0.013386650221664452
+Epoch: 46 Idx: 0 Loss: 0.01915748269744498
+Epoch: 47 Idx: 0 Loss: 0.02389448167885764
+Epoch: 48 Idx: 0 Loss: 0.021416897839860997
+Epoch: 49 Idx: 0 Loss: 0.020604889553741252
+Len (direct inputs):  3734
+Inputs len 3800 19 4745
+Len (direct inputs):  964
+Starting sliding window evaluation...
+Step 5.0/7
+Val onto:  [('cmt', 'edas'), ('cmt', 'confOf')] test_onto:  [('iasted', 'sigkdd')]
+Training size: 108728 Testing size: 7539
+Epoch: 0 Idx: 0 Loss: 0.15765170058026526
+Epoch: 0 Idx: 5000 Loss: 0.009032165821213318
+Epoch: 1 Idx: 0 Loss: 0.01993484749919649
+Epoch: 1 Idx: 5000 Loss: 0.022928185654422957
+Epoch: 2 Idx: 0 Loss: 0.005504057316193854
+Epoch: 2 Idx: 5000 Loss: 0.017092588623687628
+Epoch: 3 Idx: 0 Loss: 0.027616815907399242
+Epoch: 3 Idx: 5000 Loss: 0.01293939199428527
+Epoch: 4 Idx: 0 Loss: 0.011974099188074325
+Epoch: 4 Idx: 5000 Loss: 0.017533928139453925
+Epoch: 5 Idx: 0 Loss: 0.008612487085196189
+Epoch: 5 Idx: 5000 Loss: 0.009317662837507384
+Epoch: 6 Idx: 0 Loss: 0.03119664394244802
+Epoch: 6 Idx: 5000 Loss: 0.012234348950109988
+Epoch: 7 Idx: 0 Loss: 0.01363900401388338
+Epoch: 7 Idx: 5000 Loss: 0.023760748978343432
+Epoch: 8 Idx: 0 Loss: 0.02892257584135424
+Epoch: 8 Idx: 5000 Loss: 0.02143447463671752
+Epoch: 9 Idx: 0 Loss: 0.024881355786725158
+Epoch: 9 Idx: 5000 Loss: 0.010067137872521368
+Epoch: 10 Idx: 0 Loss: 0.01509408118305106
+Epoch: 10 Idx: 5000 Loss: 0.013671862542923855
+Epoch: 11 Idx: 0 Loss: 0.015105235668715519
+Epoch: 11 Idx: 5000 Loss: 0.019730450289174438
+Epoch: 12 Idx: 0 Loss: 0.015018375404152427
+Epoch: 12 Idx: 5000 Loss: 0.013238288548570003
+Epoch: 13 Idx: 0 Loss: 0.008194068489385973
+Epoch: 13 Idx: 5000 Loss: 0.02644018158950703
+Epoch: 14 Idx: 0 Loss: 0.017856165672663633
+Epoch: 14 Idx: 5000 Loss: 0.011385621546617694
+Epoch: 15 Idx: 0 Loss: 0.015767096732836876
+Epoch: 15 Idx: 5000 Loss: 0.019883200627414624
+Epoch: 16 Idx: 0 Loss: 0.007268684910052559
+Epoch: 16 Idx: 5000 Loss: 0.026613628440034804
+Epoch: 17 Idx: 0 Loss: 0.01502770363480114
+Epoch: 17 Idx: 5000 Loss: 0.007807957430522796
+Epoch: 18 Idx: 0 Loss: 0.009399882122766557
+Epoch: 18 Idx: 5000 Loss: 0.03296720139967607
+Epoch: 19 Idx: 0 Loss: 0.007446656725620076
+Epoch: 19 Idx: 5000 Loss: 0.031048967352675642
+Epoch: 20 Idx: 0 Loss: 0.009793212480439987
+Epoch: 20 Idx: 5000 Loss: 0.01773646619202562
+Epoch: 21 Idx: 0 Loss: 0.022064595805838076
+Epoch: 21 Idx: 5000 Loss: 0.01048604986507928
+Epoch: 22 Idx: 0 Loss: 0.009657081588747823
+Epoch: 22 Idx: 5000 Loss: 0.014885184933111978
+Epoch: 23 Idx: 0 Loss: 0.010501378262185383
+Epoch: 23 Idx: 5000 Loss: 0.01248068205681849
+Epoch: 24 Idx: 0 Loss: 0.010625460618808752
+Epoch: 24 Idx: 5000 Loss: 0.026804909406809983
+Epoch: 25 Idx: 0 Loss: 0.05265614441105592
+Epoch: 25 Idx: 5000 Loss: 0.006251416867958029
+Epoch: 26 Idx: 0 Loss: 0.017291871662036547
+Epoch: 26 Idx: 5000 Loss: 0.010819019665306285
+Epoch: 27 Idx: 0 Loss: 0.012441194845695454
+Epoch: 27 Idx: 5000 Loss: 0.009400868644190015
+Epoch: 28 Idx: 0 Loss: 0.019767923065660768
+Epoch: 28 Idx: 5000 Loss: 0.023985336898257367
+Epoch: 29 Idx: 0 Loss: 0.013937004776810175
+Epoch: 29 Idx: 5000 Loss: 0.007576491270835652
+Epoch: 30 Idx: 0 Loss: 0.01982520163891507
+Epoch: 30 Idx: 5000 Loss: 0.013857514412490769
+Epoch: 31 Idx: 0 Loss: 0.009503014422033912
+Epoch: 31 Idx: 5000 Loss: 0.01674533657441895
+Epoch: 32 Idx: 0 Loss: 0.01658946086799239
+Epoch: 32 Idx: 5000 Loss: 0.023173871696082163
+Epoch: 33 Idx: 0 Loss: 0.013942310360175087
+Epoch: 33 Idx: 5000 Loss: 0.02465062559072983
+Epoch: 34 Idx: 0 Loss: 0.02053665591397106
+Epoch: 34 Idx: 5000 Loss: 0.012298141526002487
+Epoch: 35 Idx: 0 Loss: 0.009920575418993568
+Epoch: 35 Idx: 5000 Loss: 0.01284250657334554
+Epoch: 36 Idx: 0 Loss: 0.010626761209457792
+Epoch: 36 Idx: 5000 Loss: 0.017755821811527905
+Epoch: 37 Idx: 0 Loss: 0.01421580163363137
+Epoch: 37 Idx: 5000 Loss: 0.040881229558461345
+Epoch: 38 Idx: 0 Loss: 0.028282934115982518
+Epoch: 38 Idx: 5000 Loss: 0.013115165368021294
+Epoch: 39 Idx: 0 Loss: 0.020790663428348663
+Epoch: 39 Idx: 5000 Loss: 0.010095318216082106
+Epoch: 40 Idx: 0 Loss: 0.006827917761368036
+Epoch: 40 Idx: 5000 Loss: 0.018012123235176078
+Epoch: 41 Idx: 0 Loss: 0.015680293030125438
+Epoch: 41 Idx: 5000 Loss: 0.00905984436471449
+Epoch: 42 Idx: 0 Loss: 0.015578505420459222
+Epoch: 42 Idx: 5000 Loss: 0.008584419670610409
+Epoch: 43 Idx: 0 Loss: 0.03235612369348015
+Epoch: 43 Idx: 5000 Loss: 0.007432706253420882
+Epoch: 44 Idx: 0 Loss: 0.009006855652402742
+Epoch: 44 Idx: 5000 Loss: 0.03408111422143804
+Epoch: 45 Idx: 0 Loss: 0.021072522365253123
+Epoch: 45 Idx: 5000 Loss: 0.009868760736349383
+Epoch: 46 Idx: 0 Loss: 0.019084193206100775
+Epoch: 46 Idx: 5000 Loss: 0.009483274905347788
+Epoch: 47 Idx: 0 Loss: 0.03401533565305423
+Epoch: 47 Idx: 5000 Loss: 0.020138282034542074
+Epoch: 48 Idx: 0 Loss: 0.003910714094785222
+Epoch: 48 Idx: 5000 Loss: 0.03369038350185764
+Epoch: 49 Idx: 0 Loss: 0.0153429329680809
+Epoch: 49 Idx: 5000 Loss: 0.02040819455966806
+Len (direct inputs):  2762
+Inputs len 6762 15 7524
+Len (direct inputs):  777
+Starting sliding window evaluation...
+Step 6.0/7
+Val onto:  [('edas', 'iasted'), ('edas', 'ekaw')] test_onto:  [('confOf', 'iasted')]
+Training size: 92881 Testing size: 5883
+Epoch: 0 Idx: 0 Loss: 0.2144220825990747
+Epoch: 1 Idx: 0 Loss: 0.027954733138388102
+Epoch: 2 Idx: 0 Loss: 0.010503719724082258
+Epoch: 3 Idx: 0 Loss: 0.015235757933014984
+Epoch: 4 Idx: 0 Loss: 0.013640039813288003
+Epoch: 5 Idx: 0 Loss: 0.015269930116470749
+Epoch: 6 Idx: 0 Loss: 0.005028148548344395
+Epoch: 7 Idx: 0 Loss: 0.008793941953662763
+Epoch: 8 Idx: 0 Loss: 0.0060155349057788975
+Epoch: 9 Idx: 0 Loss: 0.01418066941214463
+Epoch: 10 Idx: 0 Loss: 0.010665797629599199
+Epoch: 11 Idx: 0 Loss: 0.02078886624393672
+Epoch: 12 Idx: 0 Loss: 0.03567700730125717
+Epoch: 13 Idx: 0 Loss: 0.009596823905973887
+Epoch: 14 Idx: 0 Loss: 0.00764447051377338
+Epoch: 15 Idx: 0 Loss: 0.015772962043121643
+Epoch: 16 Idx: 0 Loss: 0.007060279893694615
+Epoch: 17 Idx: 0 Loss: 0.018410908628016795
+Epoch: 18 Idx: 0 Loss: 0.011121516762808956
+Epoch: 19 Idx: 0 Loss: 0.008410844596041226
+Epoch: 20 Idx: 0 Loss: 0.013947048130409343
+Epoch: 21 Idx: 0 Loss: 0.007335687916491496
+Epoch: 22 Idx: 0 Loss: 0.025896061968822128
+Epoch: 23 Idx: 0 Loss: 0.021414085977849242
+Epoch: 24 Idx: 0 Loss: 0.014693048259091998
+Epoch: 25 Idx: 0 Loss: 0.01051765508479026
+Epoch: 26 Idx: 0 Loss: 0.016714124918418075
+Epoch: 27 Idx: 0 Loss: 0.01984640558852141
+Epoch: 28 Idx: 0 Loss: 0.012375972282888132
+Epoch: 29 Idx: 0 Loss: 0.015600849214964845
+Epoch: 30 Idx: 0 Loss: 0.012696255564568812
+Epoch: 31 Idx: 0 Loss: 0.009611960086913203
+Epoch: 32 Idx: 0 Loss: 0.013884444919379915
+Epoch: 33 Idx: 0 Loss: 0.015825666298906135
+Epoch: 34 Idx: 0 Loss: 0.03403838582955287
+Epoch: 35 Idx: 0 Loss: 0.015380310759980349
+Epoch: 36 Idx: 0 Loss: 0.016807493099701865
+Epoch: 37 Idx: 0 Loss: 0.010806656066359561
+Epoch: 38 Idx: 0 Loss: 0.007735775018098115
+Epoch: 39 Idx: 0 Loss: 0.01264017000065197
+Epoch: 40 Idx: 0 Loss: 0.010666101570628465
+Epoch: 41 Idx: 0 Loss: 0.008087510548058358
+Epoch: 42 Idx: 0 Loss: 0.01822243755705896
+Epoch: 43 Idx: 0 Loss: 0.028738225362797208
+Epoch: 44 Idx: 0 Loss: 0.006891916668677585
+Epoch: 45 Idx: 0 Loss: 0.014217703963718888
+Epoch: 46 Idx: 0 Loss: 0.009293365712440209
+Epoch: 47 Idx: 0 Loss: 0.019729722086627842
+Epoch: 48 Idx: 0 Loss: 0.025796041084993403
+Epoch: 49 Idx: 0 Loss: 0.014388473698160646
+Len (direct inputs):  3029
+Inputs len 5244 9 5874
+Len (direct inputs):  639
+Performance for  [('conference', 'sigkdd')] is : (0.7692307692307693, 0.6666666666666666, 0.7142857142857142, 0.684931506849315, 0.7462686567164178)
+Performance for  [('ekaw', 'sigkdd')] is : (0.8333333333333334, 0.9090909090909091, 0.8695652173913043, 0.8928571428571429, 0.8474576271186441)
+Performance for  [('conference', 'edas')] is : (0.8125, 0.7647058823529411, 0.787878787878788, 0.7738095238095238, 0.8024691358024691)
+Performance for  [('cmt', 'ekaw')] is : (0.45454545454545453, 0.45454545454545453, 0.45454545454545453, 0.45454545454545453, 0.45454545454545453)
+Performance for  [('confOf', 'edas')] is : (0.65, 0.6842105263157895, 0.6666666666666667, 0.6770833333333334, 0.6565656565656566)
+Performance for  [('iasted', 'sigkdd')] is : (0.631578947368421, 0.8, 0.7058823529411765, 0.7594936708860761, 0.6593406593406593)
+Performance for  [('confOf', 'iasted')] is : (1.0, 0.5555555555555556, 0.7142857142857143, 0.6097560975609756, 0.8620689655172413)
+Final Results: [0.73588407 0.69068214 0.70187284 0.69321096 0.71838802]
+Threshold:  0.912
+Exception ignored in: <function CapturableResourceDeleter.__del__ at 0x2b2694a05af0>
 Traceback (most recent call last):
-  File "main.py", line 517, in <module>
-    loss.backward()
-  File "/u/harshitk/miniconda3/envs/py37/lib/python3.7/site-packages/torch/tensor.py", line 185, in backward
-    torch.autograd.backward(self, gradient, retain_graph, create_graph)
-  File "/u/harshitk/miniconda3/envs/py37/lib/python3.7/site-packages/torch/autograd/__init__.py", line 127, in backward
-    allow_unreachable=True)  # allow_unreachable flag
-KeyboardInterrupt
+  File "/u/shagutt1/miniconda3/envs/allennlp_robustfill/lib/python3.8/site-packages/tensorflow/python/training/tracking/tracking.py", line 201, in __del__
+  File "/u/shagutt1/miniconda3/envs/allennlp_robustfill/lib/python3.8/site-packages/tensorflow/python/eager/context.py", line 2008, in eager_mode
+TypeError: 'NoneType' object is not callable
 
 ------------------------------------------------------------
-Sender: LSF System <rer@dccxc234>
-Subject: Job 4066872: <python main.py 6 2 False True> in cluster <dcc> Exited
+Sender: LSF System <rer@dccxc251>
+Subject: Job 4142756: <python main.py 6 2 False True> in cluster <dcc> Done
 
-Job <python main.py 6 2 False True> was submitted from host <dccxl004> by user <harshitk> in cluster <dcc> at Tue Sep 15 15:48:39 2020
-Job was executed on host(s) <dccxc234>, in queue <x86_24h>, as user <harshitk> in cluster <dcc> at Tue Sep 15 15:49:37 2020
-</u/harshitk> was used as the home directory.
-</dccstor/cogfin/arvind/da/VeeAlign/src> was used as the working directory.
-Started at Tue Sep 15 15:49:37 2020
-Terminated at Wed Sep 16 04:38:41 2020
-Results reported at Wed Sep 16 04:38:41 2020
+Job <python main.py 6 2 False True> was submitted from host <dccxl010> by user <shagutt1> in cluster <dcc> at Wed Sep 16 06:58:27 2020
+Job was executed on host(s) <dccxc251>, in queue <x86_24h>, as user <shagutt1> in cluster <dcc> at Wed Sep 16 10:04:14 2020
+</u/shagutt1> was used as the home directory.
+</u/shagutt1/VeeAlign/src> was used as the working directory.
+Started at Wed Sep 16 10:04:14 2020
+Terminated at Wed Sep 16 14:51:19 2020
+Results reported at Wed Sep 16 14:51:19 2020
 
 Your job looked like:
 
@@ -692,21 +709,20 @@ Your job looked like:
 python main.py 6 2 False True
 ------------------------------------------------------------
 
-TERM_OWNER: job killed by owner.
-Exited with exit code 1.
+Successfully completed.
 
 Resource usage summary:
 
-    CPU time :                                   46140.38 sec.
-    Max Memory :                                 2890 MB
-    Average Memory :                             2750.63 MB
+    CPU time :                                   17210.34 sec.
+    Max Memory :                                 4212 MB
+    Average Memory :                             4050.51 MB
     Total Requested Memory :                     43417.00 MB
-    Delta Memory :                               40527.00 MB
+    Delta Memory :                               39205.00 MB
     Max Swap :                                   -
     Max Processes :                              3
-    Max Threads :                                13
-    Run time :                                   46171 sec.
-    Turnaround time :                            46202 sec.
+    Max Threads :                                15
+    Run time :                                   17250 sec.
+    Turnaround time :                            28372 sec.
 
 The output (if any) is above this job summary.
 
