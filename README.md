@@ -19,7 +19,7 @@ We also provide the datasets used for experimentation, in the `datasets` folder 
 
 ## Configuration
 
-This section details in tabular format, the various configurational fields in `config.ini` and the best performing values for each of the datasets.
+This section details in tabular format, the various configurational fields in `config.ini` and the best performing values for each of the datasets.
 
 | Parameter          | Conference | Lebensmittel | Freizeit | Web-directory | Description                                                                                                   |
 |--------------------|------------|--------------|----------|---------------|---------------------------------------------------------------------------------------------------------------|
@@ -29,10 +29,10 @@ This section details in tabular format, the various configurational fields in `
 | ontology_split     | True       | False        | False    | False         | Determines if training data should be split on ontology level (True) or on element level (False)          |
 | max_false_examples | 150000     | 150000       | 150000   | 150000        | Max number of false (dissimilar) examples to take while training                                          |
 | has_spellcheck     | True       | False        | False    | False         | Whether or not to use an English spelling checker while preprocessing.                                    |
-| max_paths          | 2          | 2            | 16       | 1             | Max number of paths to consider, per node                                                                     |
-| max_pathlen        | 26         | 1            | 1        | 3             | Max length of the path to consider                                                                            |
-| bag_of_neighbours  | True       | False        | False    | True          | Determines whether one-hop neighbours are treated as a bag of nodes, or path of length one (see paper)     |
-| weighted_sum       | True       | False        | False    | True          | Determines whether unified path representation is computed using weighted sum, or max pooling (see paper) |
+| max_paths          | 5          | 2            | 16       | 1             | Max number of paths to consider, per node                                                                     |
+| max_pathlen        | 6         | 1            | 1        | 3             | Max length of the path to consider                                                                            |
+| bag_of_neighbours  | False       | False        | False    | True          | Determines whether one-hop neighbours are treated as a bag of nodes, or path of length one (see paper)     |
+| weighted_sum       | False       | False        | False    | True          | Determines whether unified path representation is computed using weighted sum, or max pooling (see paper) |
 | lr                 | 0.001      | 0.001        | 0.001    | 0.001         | Learning rate                                                                                                 |
 | num_epochs         | 50         | 50           | 50       | 50            | Number of epochs                                                                                              |
 | weight_decay       | 0.001      | 0.001        | 0.001    | 0.001         | Weight decay                                                                                                  |
