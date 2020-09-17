@@ -11,7 +11,7 @@ Please run the following commands:
 3. `cd src/`
 4. `python3 main.py`
 
-`main.py` will run with config parameters described in `config.ini`. Details on the configurational parameters and how to set them for reproducibility are described in 
+`main.py` will run with config parameters described in `config.ini`. Details on the configurational parameters and how to set them for reproducibility are described [here](#configuration).
 
 ## Files
 
