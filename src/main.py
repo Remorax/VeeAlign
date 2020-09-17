@@ -38,9 +38,8 @@ K = int(config["General"]["K"])
 ontology_split = str(config["General"]["ontology_split"]) == "True"
 max_false_examples = int(config["General"]["max_false_examples"])
 
-alignment_folder = prefix_path + str(config["Paths"]["alignment_folder"])
-train_folder = prefix_path + str(config["Paths"]["train_folder"])
-model_path = prefix_path + str(config["Paths"]["model_path"])
+alignment_folder = prefix_path + "datasets/" + str(config["General"]["dataset"]) + "/alignments/"
+train_folder = prefix_path + "datasets/" + str(config["General"]["dataset"]) + "/ontologies/"
 
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
@@ -48,11 +47,10 @@ spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 # max_pathlen = int(config["Parameters"]["max_pathlen"])
 max_paths = int(sys.argv[2])
 max_pathlen = int(sys.argv[1])
-threshold = float(config["Parameters"]["threshold"])
 # bag_of_neighbours = config["Parameters"]["bag_of_neighbours"] == "True"
-# weighted_average = config["Parameters"]["weighted_average"] == "True"
+# weighted_sum = config["Parameters"]["weighted_sum"] == "True"
 bag_of_neighbours = sys.argv[3] == "True"
-weighted_average = sys.argv[4] == "True"
+weighted_sum = sys.argv[4] == "True"
 
 lr = float(config["Hyperparameters"]["lr"])
 num_epochs = int(config["Hyperparameters"]["num_epochs"])
@@ -233,7 +231,7 @@ def optimize_threshold():
             threshold += step
         
 def calculate_performance():
-    all_metrics, all_fn, all_fp = [], [], []
+    f1_scores, all_fn, all_fp = [], [], []
     for (index, test_data_t, all_results) in final_results:
         res = []
         for i,key in enumerate(all_results):
@@ -249,19 +247,17 @@ def calculate_performance():
             precision = tp/(tp+fp)
             recall = tp/(tp+fn)
             f1score = 2 * precision * recall / (precision + recall)
-            f2score = 5 * precision * recall / (4 * precision + recall)
-            f0_5score = 1.25 * precision * recall / (0.25 * precision + recall)
         except Exception as e:
             print (e)
             continue
         if ontology_split:
-            print ("Performance for ", ontologies_in_alignment[index+2: index+3], "is :", (precision, recall, f1score, f2score, f0_5score))
+            print ("F1-Score for ", ontologies_in_alignment[index+2: index+3], "is :", f1score)
         else:
-            print ("Performance for ", index, "th fold is :", (precision, recall, f1score, f2score, f0_5score))
+            print ("F1-Score for ", index, "th fold is :", f1score)
         all_fn.extend(fn_list)
         all_fp.extend(fp_list)
-        all_metrics.append((precision, recall, f1score, f2score, f0_5score))
-    return all_metrics, all_fn, all_fp
+        f1_scores.append(f1score)
+    return f1_scores, all_fn, all_fp
 
 class SiameseNetwork(nn.Module):
     # Defines the Siamese Network model
@@ -317,7 +313,7 @@ class SiameseNetwork(nn.Module):
             path_weights = path_weights.squeeze(1).reshape(-1, self.n_neighbours, self.max_paths, self.max_pathlen)
             path_weights = torch.sum(path_weights, dim=-1)
             
-            if weighted_average:
+            if weighted_sum:
                 # Calculate unified path representation as a weighted sum of all paths.
                 path_weights = self.masked_softmax(path_weights)
                 feature_emb_reshaped = feature_emb.reshape(-1, self.max_paths, self.max_pathlen * self.embedding_dim)
@@ -420,6 +416,7 @@ if ontology_split:
     step = int(len(ontologies_in_alignment)/K)
     data_iter = list(range(0, len(ontologies_in_alignment), step))
 else:
+    step = 1
     data_iter = list(range(K))
 ontologies_in_alignment = [tuple([elem.split("/")[-1].rsplit(".",1)[0] for elem in pair]) for pair in ontologies_in_alignment]
 
@@ -534,7 +531,6 @@ for index in data_iter:
 threshold_results_mean = {el: np.mean(threshold_results[el], axis=0) for el in threshold_results}    
 threshold = max(threshold_results_mean.keys(), key=(lambda key: threshold_results_mean[key][2]))
 
-all_metrics, all_fn, all_fp = calculate_performance()
+all_f1scores, all_fn, all_fp = calculate_performance()
 
-print ("Final Results: " + str(np.mean(all_metrics, axis=0)))
-print ("Threshold: ", threshold)
+print ("Mean F1-score is: {} at optimum threshold of: {}".format(str(np.mean(all_f1scores)), threshold))
