@@ -21,7 +21,7 @@ prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1
 config = configparser.ConfigParser()
 config.read(prefix_path + 'src/config.ini')
 
-print("Prefix path: ", prefix_path)
+logging.info("Prefix path: ", prefix_path)
 
 # Initialize variables from config
 language = str(config["General"]["Language"])
@@ -45,7 +45,7 @@ preprocessing = DataParser(test_ontologies, language)
 test_data, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
 if os.path.isfile(cached_embeddings_path):
-    print("Found cached embeddings...")
+    logging.info("Found cached embeddings...")
     emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = pickle.load(open(cached_embeddings_path, "rb"))
 else:
     emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = {}, {}, []
@@ -249,7 +249,7 @@ np.random.shuffle(test_data)
 
 torch.set_default_dtype(torch.float64)
 
-print ("Loading trained model....")
+logging.info ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = SiameseNetwork(emb_vals).to(device)
 
@@ -262,11 +262,11 @@ model.load_state_dict(model_dict)
 
 threshold = model.threshold.data.cpu().numpy()[0]
 
-print ("Model loaded successfully!")
+logging.info ("Model loaded successfully!")
 
 model.eval()
 
-print ("Length of test data:", len(test_data))
+logging.info ("Length of test data:", len(test_data))
 
 all_results = OrderedDict()    
 direct_inputs = []
@@ -296,10 +296,10 @@ with torch.no_grad():
             ent1 = emb_indexer_inv[nodes[idx][0]]
             ent2 = emb_indexer_inv[nodes[idx][1]]
             if (ent1, ent2) in all_results:
-                print ("Error: ", ent1, ent2, "already present")
+                logging.info ("Error: ", ent1, ent2, "already present")
             all_results[(ent1, ent2)] = (round(pred_elem, 3), pred_elem>=threshold)
     
-    print ("Len (direct inputs): ", len(direct_inputs))
+    logging.info ("Len (direct inputs): ", len(direct_inputs))
     for idx, direct_input in enumerate(direct_inputs):
         ent1 = emb_indexer_inv[direct_input[0]]
         ent2 = emb_indexer_inv[direct_input[1]]
