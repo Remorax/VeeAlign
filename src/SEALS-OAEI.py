@@ -1,4 +1,4 @@
-import configparser, sys, logging, random
+import configparser, sys, logging, random, os
 import numpy as np
 from collections import OrderedDict
 from math import ceil
@@ -21,13 +21,14 @@ prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1
 config = configparser.ConfigParser()
 config.read(prefix_path + 'src/config.ini')
 
-logging.info("Prefix path: ", prefix_path)
+print("Prefix path: ", prefix_path)
 
 # Initialize variables from config
 language = str(config["General"]["Language"])
 
 model_path = prefix_path + str(config["Paths"]["load_model_path"])
 output_path = prefix_path + str(config["Paths"]["output_folder"])
+cached_embeddings_path = prefix_path + str(config["Paths"]["embedding_cache_path"])
 spellcheck = config["Preprocessing"]["has_spellcheck"] == "True"
 
 max_paths = int(config["Parameters"]["max_paths"])
@@ -41,7 +42,24 @@ test_ontologies = [tuple([ont_name1, ont_name2])]
 
 # Preprocessing and parsing input data for testing
 preprocessing = DataParser(test_ontologies, language)
-test_data, emb_indexer, emb_indexer_inv, emb_vals, neighbours_dicts, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
+test_data, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
+
+if os.path.isfile(cached_embeddings_path):
+    print("Found cached embeddings...")
+    emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = pickle.load(open(cached_embeddings_path, "rb"))
+else:
+    emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = {}, {}, []
+
+emb_vals, emb_indexer, emb_indexer_inv = list(emb_vals_cached), dict(emb_indexer_cached), dict(emb_indexer_inv_cached)
+
+s = set(emb_indexer.keys())
+idx = len(emb_indexer_inv)
+for term in emb_indexer_new:
+    if term not in s:
+        emb_indexer[term] = idx
+        emb_indexer_inv[idx] = term
+        emb_vals.append(emb_vals_new[emb_indexer_new[term]])
+        idx += 1
 
 class SiameseNetwork(nn.Module):
     # Defines the Siamese Network model
@@ -231,7 +249,7 @@ np.random.shuffle(test_data)
 
 torch.set_default_dtype(torch.float64)
 
-logging.info ("Loading trained model....")
+print ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = SiameseNetwork(emb_vals).to(device)
 
@@ -244,11 +262,11 @@ model.load_state_dict(model_dict)
 
 threshold = model.threshold.data.cpu().numpy()[0]
 
-logging.info ("Model loaded successfully!")
+print ("Model loaded successfully!")
 
 model.eval()
 
-logging.info ("Length of test data:", len(test_data))
+print ("Length of test data:", len(test_data))
 
 all_results = OrderedDict()    
 direct_inputs = []
@@ -278,10 +296,10 @@ with torch.no_grad():
             ent1 = emb_indexer_inv[nodes[idx][0]]
             ent2 = emb_indexer_inv[nodes[idx][1]]
             if (ent1, ent2) in all_results:
-                logging.info ("Error: ", ent1, ent2, "already present")
+                print ("Error: ", ent1, ent2, "already present")
             all_results[(ent1, ent2)] = (round(pred_elem, 3), pred_elem>=threshold)
     
-    logging.info ("Len (direct inputs): ", len(direct_inputs))
+    print ("Len (direct inputs): ", len(direct_inputs))
     for idx, direct_input in enumerate(direct_inputs):
         ent1 = emb_indexer_inv[direct_input[0]]
         ent2 = emb_indexer_inv[direct_input[1]]
