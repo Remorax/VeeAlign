@@ -1,4 +1,4 @@
-import configparser, sys, logging, random, os
+import configparser, sys, logging, random, os, pickle
 import numpy as np
 from collections import OrderedDict
 from math import ceil
