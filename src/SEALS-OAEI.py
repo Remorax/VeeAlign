@@ -81,11 +81,11 @@ class SiameseNetwork(nn.Module):
         self.output = nn.Linear(2*self.embedding_dim, 300)
         
         self.v = nn.Parameter(torch.DoubleTensor([1/(self.max_pathlen) for i in range(self.max_pathlen)]))
-        if max_types == 4:
+        if self.n_neighbours == 4:
             self.w_rootpath = nn.Parameter(torch.DoubleTensor([0.25]))
             self.w_children = nn.Parameter(torch.DoubleTensor([0.25]))
             self.w_obj_neighbours = nn.Parameter(torch.DoubleTensor([0.25]))
-        elif max_types == 3:
+        elif self.n_neighbours == 3:
             self.w_rootpath = nn.Parameter(torch.DoubleTensor([0.33]))
             self.w_children = nn.Parameter(torch.DoubleTensor([0.33]))
         else:
@@ -251,12 +251,14 @@ torch.set_default_dtype(torch.float64)
 
 logging.info ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-model = SiameseNetwork(emb_vals).to(device)
 
 pretrained_dict = torch.load(model_path, map_location=torch.device(device))
+pretrained_dict = {k: v for k, v in pretrained_dict.items() if k!="name_embedding.weight"}
+max_types = len([key for key in pretrained_dict.keys() if key.startswith("w_")]) + 1
+
+model = SiameseNetwork(emb_vals).to(device)
 model_dict = model.state_dict()
 
-pretrained_dict = {k: v for k, v in pretrained_dict.items() if k!="name_embedding.weight"}
 model_dict.update(pretrained_dict)
 model.load_state_dict(model_dict)
 
