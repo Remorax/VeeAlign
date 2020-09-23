@@ -180,10 +180,10 @@ class DataParser():
             ont_name = word.split("#")[0]
             elem = word.split("#")[1]
             try:
-                elem = mapping_ont[ont_name].mapping_dict[elem]
+                ff = mapping_ont[ont_name].mapping_dict[elem]
             except Exception as e:
                 print (e)
-                raise
+                pass
             inp.append(self.parse(mapping_ont[ont_name].mapping_dict.get(elem, elem)))
 
         print ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
