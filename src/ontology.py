@@ -36,7 +36,8 @@ class Ontology():
         Constructs ID to label mapping dict for ontologies where 
         entities are identified by IDs.
         '''
-        self.mapping_dict = {self.extract_ID(el, False): self.get_child_node(el, "rdfs:label")[0].firstChild.nodeValue for el in self.root.getElementsByTagName("owl:Class") if self.get_child_node(el, "rdfs:label")}
+        elements = self.root.getElementsByTagName("owl:Class") + self.root.getElementsByTagName("owl:ObjectProperty") + self.root.getElementsByTagName("owl:DatatypeProperty")
+        self.mapping_dict = {self.extract_ID(el, False): self.get_child_node(el, "rdfs:label")[0].firstChild.nodeValue for el in elements if self.get_child_node(el, "rdfs:label")}
         self.mapping_dict_inv = {self.mapping_dict[key]: key for key in self.mapping_dict}
         return
         
@@ -201,7 +202,7 @@ class Ontology():
         numerical IDs, it returns the label (stored in mapping_dict)
         '''
         element_id = element.getAttribute("rdf:ID") or element.getAttribute("rdf:resource") or element.getAttribute("rdf:about")
-        element_id = element_id.split("#")[-1]
+        element_id = element_id.split("#")[-1].split(";")[-1]
         if len(list(filter(str.isdigit, element_id))) >= 3 and "_" in element_id and check_coded:
             return self.mapping_dict[element_id]
         return element_id.replace("UNDEFINED_", "").replace("DO_", "")
