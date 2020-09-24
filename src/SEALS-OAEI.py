@@ -25,7 +25,7 @@ logging.info("Prefix path: ", prefix_path)
 
 # Initialize variables from config
 language = str(config["General"]["language"])
-print ("Language: ", language)
+logging.info("Language: ", language)
 quick_mode = str(config["General"]["quick_mode"])
 
 model_path = prefix_path + str(config["Paths"]["load_model_path"])
@@ -54,17 +54,14 @@ else:
 
 emb_vals, emb_indexer, emb_indexer_inv = list(emb_vals_cached), dict(emb_indexer_cached), dict(emb_indexer_inv_cached)
 
-print ("Original Length of emb_indexer: ", len(emb_indexer))
 s = set(emb_indexer.keys())
 idx = len(emb_indexer_inv)
 for term in emb_indexer_new:
     if term not in s:
-        print ("Some term that doesnt belong here", term)
         emb_indexer[term] = idx
         emb_indexer_inv[idx] = term
         emb_vals.append(emb_vals_new[emb_indexer_new[term]])
         idx += 1
-print ("Final Length of emb_indexer: ", len(emb_indexer))
 
 class VeeAlign(nn.Module):
     # Defines the VeeAlign Siamese Network model
