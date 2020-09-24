@@ -364,4 +364,5 @@ f = ont_name_parsed1 + "-" + ont_name_parsed2 + ".rdf"
 
 open(output_path + f, "w+").write(write_results())
 
+print ("The final alignment file can be found below: ")
 print("file://" + output_path + f)
