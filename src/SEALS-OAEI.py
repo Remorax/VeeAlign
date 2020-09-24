@@ -293,7 +293,7 @@ print ("Optimum Threshold: {}".format(threshold))
 
 model.eval()
 
-print ("Length of test data:", len(test_data_ent) + len(test_data_prop))
+print ("Length of test data(ent): {} test data(prop):{}".format(len(test_data_ent), len(test_data_prop)))
 
 all_results = OrderedDict()    
 direct_inputs = []
