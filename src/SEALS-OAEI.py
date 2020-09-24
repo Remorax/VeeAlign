@@ -21,7 +21,7 @@ prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1
 config = configparser.ConfigParser()
 config.read(prefix_path + 'src/config.ini')
 
-logging.info("Prefix path: ", prefix_path)
+print("Prefix path: ", prefix_path)
 
 # Initialize variables from config
 language = str(config["General"]["Language"])
@@ -45,7 +45,7 @@ preprocessing = DataParser(test_ontologies, language)
 test_data_ent, test_data_prop, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts_ent, neighbours_dicts_prop, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
 if os.path.isfile(cached_embeddings_path):
-    logging.info("Found cached embeddings...")
+    print("Found cached embeddings...")
     emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = pickle.load(open(cached_embeddings_path, "rb"))
 else:
     emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = {}, {}, []
@@ -272,7 +272,7 @@ np.random.shuffle(test_data_prop)
 
 torch.set_default_dtype(torch.float64)
 
-logging.info ("Loading trained model....")
+print ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 pretrained_dict = torch.load(model_path, map_location=torch.device(device))
@@ -287,11 +287,13 @@ model.load_state_dict(model_dict)
 
 threshold = model.threshold.data.cpu().numpy()[0]
 
-logging.info ("Model loaded successfully!")
+print ("Model loaded successfully!")
+
+print ("Optimum Threshold: {}".format(threshold))
 
 model.eval()
 
-logging.info ("Length of test data:", len(test_data_ent) + len(test_data_prop))
+print ("Length of test data:", len(test_data_ent) + len(test_data_prop))
 
 all_results = OrderedDict()    
 direct_inputs = []
@@ -309,11 +311,12 @@ with torch.no_grad():
     
     max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair]
         for elem_pair in inputs_all_prop])
-
+    print ("Max prop len: ", max_prop_len)
     batch_size = min(batch_size, len(inputs_all_ent))
     num_batches = int(ceil(len(inputs_all_ent)/batch_size))
     batch_size_prop = int(ceil(len(inputs_all_prop)/num_batches))
 
+    print ("Num batches: {} Batch size (prop): {}".format(num_batches, batch_size_prop))
     for batch_idx in range(num_batches):
         batch_start = batch_idx * batch_size
         batch_end = (batch_idx+1) * batch_size
@@ -342,10 +345,10 @@ with torch.no_grad():
                 ent1 = emb_indexer_inv[nodes_prop[idx-len(nodes_ent)][0]]
                 ent2 = emb_indexer_inv[nodes_prop[idx-len(nodes_ent)][1]]
             if (ent1, ent2) in all_results:
-                logging.info ("Error: ", ent1, ent2, "already present")
+                print ("Error: ", ent1, ent2, "already present")
             all_results[(ent1, ent2)] = (round(pred_elem, 3), pred_elem>=threshold)
     
-    logging.info ("Len (direct inputs): ", len(direct_inputs))
+    print ("Len (direct inputs): ", len(direct_inputs))
     for idx, direct_input in enumerate(direct_inputs):
         ent1 = emb_indexer_inv[direct_input[0]]
         ent2 = emb_indexer_inv[direct_input[1]]
