@@ -188,7 +188,7 @@ def embedify(seq):
             yield emb_indexer[item]
 
 def generate_data(elem_tuple, neighbours_dicts):
-    return list(embedify([neighbours_dicts[elem] for elem in elem_tuple], emb_indexer))
+    return list(embedify([neighbours_dicts[elem] for elem in elem_tuple]))
 
 def to_feature(inputs):
     inputs_lenpadded = [[[[path[:max_pathlen] + [0 for i in range(max_pathlen -len(path[:max_pathlen]))]
@@ -216,7 +216,7 @@ def generate_input(elems, neighbours_dicts):
         try:
             inputs.append(generate_data(elem, neighbours_dicts))
             nodes.append(generate_data_neighbourless(elem))
-        except:
+        except Exception as e:
             direct_inputs.append(generate_data_neighbourless(elem))
     return inputs, nodes
 
@@ -306,6 +306,9 @@ with torch.no_grad():
     all_inp = list(zip(inputs_all_prop, nodes_all_prop))
     all_inp_shuffled = random.sample(all_inp, len(all_inp))
     inputs_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled))
+    
+    max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair]
+        for elem_pair in inputs_all_prop])
 
     batch_size = min(batch_size, len(inputs_all_ent))
     num_batches = int(ceil(len(inputs_all_ent)/batch_size))
@@ -318,7 +321,7 @@ with torch.no_grad():
         batch_end_prop = (batch_idx+1) * batch_size_prop
 
         inputs_ent = np.array(to_feature(inputs_all_ent[batch_start: batch_end]))
-        nodes_ent = np.array(nodes_all_prop[batch_start: batch_end])
+        nodes_ent = np.array(nodes_all_ent[batch_start: batch_end])
 
         inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop]))
         nodes_prop = np.array(nodes_all_prop[batch_start_prop: batch_end_prop])
@@ -327,17 +330,17 @@ with torch.no_grad():
         node_ents = torch.LongTensor(nodes_ent).to(device)
         inp_props = torch.LongTensor(inputs_prop).to(device)
         node_props = torch.LongTensor(nodes_prop).to(device)
-
-        outputs = model(node_elems, inp_elems, node_props, inp_props)
+        
+        outputs = model(node_ents, inp_ents, node_props, inp_props)
         outputs = [el.item() for el in outputs]
 
         for idx, pred_elem in enumerate(outputs):
-            if idx < len(nodes):
-                ent1 = emb_indexer_inv[nodes[idx][0]]
-                ent2 = emb_indexer_inv[nodes[idx][1]]
+            if idx < len(nodes_ent):
+                ent1 = emb_indexer_inv[nodes_ent[idx][0]]
+                ent2 = emb_indexer_inv[nodes_ent[idx][1]]
             else:
-                ent1 = emb_indexer_inv[nodes_prop[idx-len(nodes)][0]]
-                ent2 = emb_indexer_inv[nodes_prop[idx-len(nodes)][1]]
+                ent1 = emb_indexer_inv[nodes_prop[idx-len(nodes_ent)][0]]
+                ent2 = emb_indexer_inv[nodes_prop[idx-len(nodes_ent)][1]]
             if (ent1, ent2) in all_results:
                 logging.info ("Error: ", ent1, ent2, "already present")
             all_results[(ent1, ent2)] = (round(pred_elem, 3), pred_elem>=threshold)

@@ -22,26 +22,25 @@ class DataParser():
             self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-multilingual/3?tf-hub-format=compressed"
         self.USE = hub.load(self.USE_link)
         self.stopwords = ["has"]
-    
+ 
     def extractUSEEmbeddings(self, words):
         # Extracts USE embeddings
-        
         word_embeddings = self.USE(words)
         return word_embeddings.numpy()
 
     def generate_mappings(self):
         # Combinatorial mapping of entities and properties in ontology pair(s)
-        all_mappings = []
+        ent_mappings, prop_mappings = [], []
         for l in self.ontologies_in_alignment:
             ont1 = Ontology(l[0])
             ont2 = Ontology(l[1])
-            
+
             ent1 = ont1.get_entities()
             ent2 = ont2.get_entities()
-            
+
             obj1 = ont1.get_object_properties()
             obj2 = ont2.get_object_properties()
-            
+
             data1 = ont1.get_data_properties()
             data2 = ont2.get_data_properties()
 
@@ -68,9 +67,9 @@ class DataParser():
                 else:
                     mapping = tuple([el.replace(",-", "_") for el in mapping])
                     if mapping in s_ent:
-                        data[mapping] = True
-                    elif mapping in s_ent:
-                        data[mapping] = True
+                        data_ent[mapping] = True
+                    elif mapping in s_prop:
+                        data_prop[mapping] = True
                     else:
                         print ("Warning: {} given in alignments could not be found in source/target ontology.".format(mapping))
                         continue
@@ -297,7 +296,7 @@ class DataParser():
             for e1, e2, p, d in prop_triples:
                 neighbours_dict_props[p][1].extend([e1])
                 neighbours_dict_props[p][2].extend([e2])
-            neighbours_dict_props = {ont + "#" + p: [list(OrderedSet([ont + "#" + e for e in elem])) 
+            neighbours_dict_props = {ont + "#" + p: [list([ont + "#" + e for e in elem])
                                     for elem in neighbours_dict_props[p]] for p in neighbours_dict_props}
             return neighbours_dict_props
 
