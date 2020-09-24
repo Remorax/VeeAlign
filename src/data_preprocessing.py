@@ -12,9 +12,10 @@ def cos_sim(a,b):
 
 class DataParser():
     """Data parsing class"""
-    def __init__(self, ontologies_in_alignment, language, gt_mappings=None):
+    def __init__(self, ontologies_in_alignment, language, quick_mode, gt_mappings=None):
         self.ontologies_in_alignment = ontologies_in_alignment
         self.gt_mappings = gt_mappings
+        self.enable_quick_mode = quick_mode
         self.language = language
         if self.language == "en":
             self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
@@ -71,7 +72,7 @@ class DataParser():
                     elif mapping in s_prop:
                         data_prop[mapping] = True
                     else:
-                        print ("Warning: {} given in alignments could not be found in source/target ontology.".format(mapping))
+                        logging.info ("Warning: {} given in alignments could not be found in source/target ontology.".format(mapping))
                         continue
             return (data_ent, data_prop)
         return (ent_mappings, prop_mappings)
@@ -91,7 +92,7 @@ class DataParser():
 
     def construct_abbreviation_resolution_dict(self, all_mappings):
         # Constructs an abbrevation resolution dict
-        print ("Constructing abbrevation resolution dict....")
+        logging.info ("Constructing abbrevation resolution dict....")
         abbreviations_dict = {}
         final_dict = {}
 
@@ -140,7 +141,7 @@ class DataParser():
 
         resolved_dict = {key: scored_dict[key][0] for key in scored_dict}
         filtered_dict = {key: " ".join(resolved_dict[key][0].split("_")) for key in resolved_dict if resolved_dict[key][-1] > 0.9}
-        print ("Results after abbreviation resolution: ", filtered_dict)
+        logging.info ("Results after abbreviation resolution: ", filtered_dict)
         return filtered_dict
 
     def camel_case_split(self, identifier):
@@ -153,7 +154,7 @@ class DataParser():
 
     def run_abbreviation_resolution(self, inp, filtered_dict):
         # Resolving abbreviations to full forms
-        print ("Resolving abbreviations...")
+        logging.info ("Resolving abbreviations...")
         inp_resolved = []
         for concept in inp:
             for key in filtered_dict:
@@ -190,7 +191,7 @@ class DataParser():
             elem = word.split("#")[1]
             inp.append(self.parse(mapping_ont[ont_name].mapping_dict.get(elem, elem)))
 
-        print ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
+        logging.info ("Total number of extracted unique classes and properties from entire RA set: ", len(extracted_elems))
 
         extracted_elems = ["<UNK>"] + extracted_elems
 
@@ -199,7 +200,7 @@ class DataParser():
 
     def run_spellcheck(self, inp):
         # Spelling checker and corrector
-        print ("Running spellcheck...")
+        logging.info ("Running spellcheck...")
 
         url = "https://grammarbot.p.rapidapi.com/check"
 
@@ -221,7 +222,7 @@ class DataParser():
                 concept_corrected = concept_corrected[:start] + elem["replacements"][0]["value"] + concept_corrected[end:]
             
             if concept.lower() != concept_corrected.lower():
-                print ("{} corrected to {}".format(concept, concept_corrected))
+                logging.info ("{} corrected to {}".format(concept, concept_corrected))
                 inp_spellchecked.append(concept_corrected)
             else:
                 inp_spellchecked.append(concept)
@@ -273,7 +274,7 @@ class DataParser():
             elif d == "Subclass":
                 neighbours_dict_ent[e2][1].append(e1_path)
             else:
-                print ("Error wrong value of d: ", d)
+                logging.info ("Error wrong value of d: ", d)
         
         rootpath_dict = ont_obj.parents_dict
         rootpath_dict_new = {}
@@ -320,7 +321,7 @@ class DataParser():
     def process(self, spellcheck=False, bag_of_neighbours=False):
         ent_mappings, prop_mappings = self.generate_mappings()
         inp, extracted_elems = self.extract_keys()
-        if self.language=="en":
+        if self.language=="en" and not self.enable_quick_mode:
             filtered_dict = self.construct_abbreviation_resolution_dict(ent_mappings + prop_mappings)
             inp_resolved = self.run_abbreviation_resolution(inp, filtered_dict)
             if spellcheck:

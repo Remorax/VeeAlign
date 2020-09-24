@@ -21,10 +21,12 @@ prefix_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("/")[:-1
 config = configparser.ConfigParser()
 config.read(prefix_path + 'src/config.ini')
 
-print("Prefix path: ", prefix_path)
+logging.info("Prefix path: ", prefix_path)
 
 # Initialize variables from config
-language = str(config["General"]["Language"])
+language = str(config["General"]["language"])
+print ("Language: ", language)
+quick_mode = str(config["General"]["quick_mode"])
 
 model_path = prefix_path + str(config["Paths"]["load_model_path"])
 output_path = prefix_path + str(config["Paths"]["output_folder"])
@@ -41,25 +43,28 @@ batch_size = int(config["Hyperparameters"]["batch_size"])
 test_ontologies = [tuple([ont_name1, ont_name2])]
 
 # Preprocessing and parsing input data for testing
-preprocessing = DataParser(test_ontologies, language)
+preprocessing = DataParser(test_ontologies, language, quick_mode)
 test_data_ent, test_data_prop, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts_ent, neighbours_dicts_prop, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
 if os.path.isfile(cached_embeddings_path):
-    print("Found cached embeddings...")
+    logging.info("Found cached embeddings...")
     emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = pickle.load(open(cached_embeddings_path, "rb"))
 else:
     emb_indexer_cached, emb_indexer_inv_cached, emb_vals_cached = {}, {}, []
 
 emb_vals, emb_indexer, emb_indexer_inv = list(emb_vals_cached), dict(emb_indexer_cached), dict(emb_indexer_inv_cached)
 
+print ("Original Length of emb_indexer: ", len(emb_indexer))
 s = set(emb_indexer.keys())
 idx = len(emb_indexer_inv)
 for term in emb_indexer_new:
     if term not in s:
+        print ("Some term that doesnt belong here", term)
         emb_indexer[term] = idx
         emb_indexer_inv[idx] = term
         emb_vals.append(emb_vals_new[emb_indexer_new[term]])
         idx += 1
+print ("Final Length of emb_indexer: ", len(emb_indexer))
 
 class VeeAlign(nn.Module):
     # Defines the VeeAlign Siamese Network model
@@ -272,7 +277,7 @@ np.random.shuffle(test_data_prop)
 
 torch.set_default_dtype(torch.float64)
 
-print ("Loading trained model....")
+logging.info ("Loading trained model....")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 pretrained_dict = torch.load(model_path, map_location=torch.device(device))
@@ -287,13 +292,13 @@ model.load_state_dict(model_dict)
 
 threshold = model.threshold.data.cpu().numpy()[0]
 
-print ("Model loaded successfully!")
+logging.info ("Model loaded successfully!")
 
-print ("Optimum Threshold: {}".format(threshold))
+logging.info ("Optimum Threshold: {}".format(threshold))
 
 model.eval()
 
-print ("Length of test data(ent): {} test data(prop):{}".format(len(test_data_ent), len(test_data_prop)))
+logging.info ("Length of test data(ent): {} test data(prop):{}".format(len(test_data_ent), len(test_data_prop)))
 
 all_results = OrderedDict()    
 direct_inputs = []
@@ -311,12 +316,12 @@ with torch.no_grad():
     
     max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair]
         for elem_pair in inputs_all_prop])
-    print ("Max prop len: ", max_prop_len)
+    logging.info ("Max prop len: ", max_prop_len)
     batch_size = min(batch_size, len(inputs_all_ent))
     num_batches = int(ceil(len(inputs_all_ent)/batch_size))
     batch_size_prop = int(ceil(len(inputs_all_prop)/num_batches))
 
-    print ("Num batches: {} Batch size (prop): {}".format(num_batches, batch_size_prop))
+    logging.info ("Num batches: {} Batch size (prop): {}".format(num_batches, batch_size_prop))
     for batch_idx in range(num_batches):
         batch_start = batch_idx * batch_size
         batch_end = (batch_idx+1) * batch_size
@@ -345,10 +350,10 @@ with torch.no_grad():
                 ent1 = emb_indexer_inv[nodes_prop[idx-len(nodes_ent)][0]]
                 ent2 = emb_indexer_inv[nodes_prop[idx-len(nodes_ent)][1]]
             if (ent1, ent2) in all_results:
-                print ("Error: ", ent1, ent2, "already present")
+                logging.info ("Error: ", ent1, ent2, "already present")
             all_results[(ent1, ent2)] = (round(pred_elem, 3), pred_elem>=threshold)
     
-    print ("Len (direct inputs): ", len(direct_inputs))
+    logging.info ("Len (direct inputs): ", len(direct_inputs))
     for idx, direct_input in enumerate(direct_inputs):
         ent1 = emb_indexer_inv[direct_input[0]]
         ent2 = emb_indexer_inv[direct_input[1]]
@@ -364,5 +369,5 @@ f = ont_name_parsed1 + "-" + ont_name_parsed2 + ".rdf"
 
 open(output_path + f, "w+").write(write_results())
 
-print ("The final alignment file can be found below: ")
+logging.info ("The final alignment file can be found below: ")
 print("file://" + output_path + f)
