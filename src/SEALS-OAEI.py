@@ -42,7 +42,7 @@ test_ontologies = [tuple([ont_name1, ont_name2])]
 
 # Preprocessing and parsing input data for testing
 preprocessing = DataParser(test_ontologies, language)
-test_data, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
+test_data_ent, test_data_prop, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts_ent, neighbours_dicts_prop, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
 if os.path.isfile(cached_embeddings_path):
     logging.info("Found cached embeddings...")
@@ -61,8 +61,8 @@ for term in emb_indexer_new:
         emb_vals.append(emb_vals_new[emb_indexer_new[term]])
         idx += 1
 
-class SiameseNetwork(nn.Module):
-    # Defines the Siamese Network model
+class VeeAlign(nn.Module):
+    # Defines the VeeAlign Siamese Network model
     def __init__(self, emb_vals, threshold=0.9):
         super().__init__() 
         self.n_neighbours = max_types
@@ -91,18 +91,25 @@ class SiameseNetwork(nn.Module):
         else:
             self.w_rootpath = nn.Parameter(torch.DoubleTensor([0.5]))
 
+        self.prop_weight = nn.Parameter(torch.DoubleTensor([0.33]))
+        self.domain_weight = nn.Parameter(torch.DoubleTensor([0.33]))
+
     def masked_softmax(self, inp):
         # To softmax all non-zero tensor values
         inp = inp.double()
         mask = ((inp != 0).double() - 1) * 9999  # for -inf
         return (inp + mask).softmax(dim=-1)
 
-    def forward(self, nodes, features):
+    def forward(self, nodes, features, prop_nodes, prop_features):
         '''
         Arguments:
             - nodes: entities being compared. dim: (batch_size, 2)
             - features: demarcated neighbourhood features of these entities. 
                         dim: (batch_size, 2, max_types, max_paths, max_pathlen)
+            - prop_nodes: properties being compared. dim: (batch_size, 2)
+            - prop_features: features of properties being compared. Includes 
+                        domain and range of these properties. 
+                        dim: (batch_size, 2, 3, max_prop_len)
         '''
         results = []
         nodes = nodes.permute(1,0) # dim: (2, batch_size)
@@ -156,8 +163,16 @@ class SiameseNetwork(nn.Module):
             contextual_node_emb = torch.cat((node_emb, context_emb), dim=1)
             output_node_emb = self.output(contextual_node_emb)
             results.append(output_node_emb)
-        sim = self.cosine_sim_layer(results[0], results[1])
-        return sim
+        sim_ent = self.cosine_sim_layer(results[0], results[1])
+        if prop_nodes.nelement() != 0:
+            # Calculate prop sum
+            aggregated_prop_sum = torch.sum(self.name_embedding(prop_features), dim=-2)
+            sim_prop = self.prop_weight * self.cosine_sim_layer(aggregated_prop_sum[:,0,0], aggregated_prop_sum[:,1,0])
+            sim_prop += self.domain_weight * self.cosine_sim_layer(aggregated_prop_sum[:,0,1], aggregated_prop_sum[:,1,1])
+            sim_prop += (1-self.prop_weight-self.domain_weight) * self.cosine_sim_layer(aggregated_prop_sum[:,0,2], aggregated_prop_sum[:,1,2])
+
+            return torch.cat((sim_ent, sim_prop))
+        return sim_ent
 
 def count_non_unk(elem):
     return len([l for l in elem if l!="<UNK>"])
@@ -172,8 +187,8 @@ def embedify(seq):
         else:
             yield emb_indexer[item]
 
-def generate_data(elem_tuple):
-    return list(embedify([neighbours_dicts[elem] for elem in elem_tuple]))
+def generate_data(elem_tuple, neighbours_dicts):
+    return list(embedify([neighbours_dicts[elem] for elem in elem_tuple], emb_indexer))
 
 def to_feature(inputs):
     inputs_lenpadded = [[[[path[:max_pathlen] + [0 for i in range(max_pathlen -len(path[:max_pathlen]))]
@@ -187,12 +202,19 @@ def to_feature(inputs):
                         for elem in inputs_lenpadded]
     return inputs_pathpadded
 
-def generate_input(elems):
+def pad_prop(inputs):
+    inputs_padded = [[[elem + [0 for i in range(max_prop_len - len(elem))]
+                         for elem in prop]
+                    for prop in elem_pair]
+                for elem_pair in inputs]
+    return inputs_padded
+
+def generate_input(elems, neighbours_dicts):
     inputs, nodes = [], []
     global direct_inputs
     for elem in list(elems):
         try:
-            inputs.append(generate_data(elem))
+            inputs.append(generate_data(elem, neighbours_dicts))
             nodes.append(generate_data_neighbourless(elem))
         except:
             direct_inputs.append(generate_data_neighbourless(elem))
@@ -245,7 +267,8 @@ torch.manual_seed(0)
 np.random.seed(0)
 random.seed(0)
 
-np.random.shuffle(test_data)
+np.random.shuffle(test_data_ent)
+np.random.shuffle(test_data_prop)
 
 torch.set_default_dtype(torch.float64)
 
@@ -256,7 +279,7 @@ pretrained_dict = torch.load(model_path, map_location=torch.device(device))
 pretrained_dict = {k: v for k, v in pretrained_dict.items() if k!="name_embedding.weight"}
 max_types = len([key for key in pretrained_dict.keys() if key.startswith("w_")]) + 1
 
-model = SiameseNetwork(emb_vals).to(device)
+model = VeeAlign(emb_vals).to(device)
 model_dict = model.state_dict()
 
 model_dict.update(pretrained_dict)
@@ -268,35 +291,53 @@ logging.info ("Model loaded successfully!")
 
 model.eval()
 
-logging.info ("Length of test data:", len(test_data))
+logging.info ("Length of test data:", len(test_data_ent) + len(test_data_prop))
 
 all_results = OrderedDict()    
 direct_inputs = []
 with torch.no_grad():
-    inputs_all, nodes_all = generate_input(test_data)
+    inputs_all_ent, nodes_all_ent = generate_input(test_data_ent, neighbours_dicts_ent)
+    inputs_all_prop, nodes_all_prop = generate_input(test_data_prop, neighbours_dicts_prop)
      
-    all_inp = list(zip(inputs_all, nodes_all))
+    all_inp = list(zip(inputs_all_ent, nodes_all_ent))
     all_inp_shuffled = random.sample(all_inp, len(all_inp))
-    inputs_all, nodes_all = list(zip(*all_inp_shuffled))
+    inputs_all_ent, nodes_all_ent = list(zip(*all_inp_shuffled))
 
-    batch_size = min(batch_size, len(inputs_all))
-    num_batches = int(ceil(len(inputs_all)/batch_size))
+    all_inp = list(zip(inputs_all_prop, nodes_all_prop))
+    all_inp_shuffled = random.sample(all_inp, len(all_inp))
+    inputs_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled))
+
+    batch_size = min(batch_size, len(inputs_all_ent))
+    num_batches = int(ceil(len(inputs_all_ent)/batch_size))
+    batch_size_prop = int(ceil(len(inputs_all_prop)/num_batches))
+
     for batch_idx in range(num_batches):
         batch_start = batch_idx * batch_size
         batch_end = (batch_idx+1) * batch_size
+        batch_start_prop = batch_idx * batch_size_prop
+        batch_end_prop = (batch_idx+1) * batch_size_prop
 
-        inputs = np.array(to_feature(inputs_all[batch_start: batch_end]))
-        nodes = np.array(nodes_all[batch_start: batch_end])
+        inputs_ent = np.array(to_feature(inputs_all_ent[batch_start: batch_end]))
+        nodes_ent = np.array(nodes_all_prop[batch_start: batch_end])
 
-        inp_elems = torch.LongTensor(inputs).to(device)
-        node_elems = torch.LongTensor(nodes).to(device)
+        inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop]))
+        nodes_prop = np.array(nodes_all_prop[batch_start_prop: batch_end_prop])
 
-        outputs = model(node_elems, inp_elems)
+        inp_ents = torch.LongTensor(inputs_ent).to(device)
+        node_ents = torch.LongTensor(nodes_ent).to(device)
+        inp_props = torch.LongTensor(inputs_prop).to(device)
+        node_props = torch.LongTensor(nodes_prop).to(device)
+
+        outputs = model(node_elems, inp_elems, node_props, inp_props)
         outputs = [el.item() for el in outputs]
 
         for idx, pred_elem in enumerate(outputs):
-            ent1 = emb_indexer_inv[nodes[idx][0]]
-            ent2 = emb_indexer_inv[nodes[idx][1]]
+            if idx < len(nodes):
+                ent1 = emb_indexer_inv[nodes[idx][0]]
+                ent2 = emb_indexer_inv[nodes[idx][1]]
+            else:
+                ent1 = emb_indexer_inv[nodes_prop[idx-len(nodes)][0]]
+                ent2 = emb_indexer_inv[nodes_prop[idx-len(nodes)][1]]
             if (ent1, ent2) in all_results:
                 logging.info ("Error: ", ent1, ent2, "already present")
             all_results[(ent1, ent2)] = (round(pred_elem, 3), pred_elem>=threshold)
@@ -313,7 +354,7 @@ final_list = [(elem[0], elem[1], str(all_results[elem][0])) for elem in all_resu
 ont_name_parsed1 = Ontology(ont_name1).extract_ns().split("/")[-1].split("#")[0].rsplit(".", 1)[0]
 ont_name_parsed2 = Ontology(ont_name2).extract_ns().split("/")[-1].split("#")[0].rsplit(".", 1)[0]
 
-f = "VeeAlign-" + ont_name_parsed1 + "-" + ont_name_parsed2 + ".rdf"
+f = ont_name_parsed1 + "-" + ont_name_parsed2 + ".rdf"
 
 open(output_path + f, "w+").write(write_results())
 
