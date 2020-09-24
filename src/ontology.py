@@ -21,10 +21,14 @@ class Ontology():
             self.ontology_obj = minidom.parse(ontology)
         self.root = self.ontology_obj.documentElement # root node
         
+        self.languages = []
         self.construct_mapping_dict()
+        # Detects language of ontology by taking max of all lang attributes in labels
+        self.detect_language()
         
         # Dict that records the immediate "subclass_of" parent of any entity
         self.parents_dict = {}
+
         self.subclasses = self.parse_subclasses()
         self.object_properties = self.parse_object_properties()
         self.data_properties = self.parse_data_properties()
@@ -37,10 +41,27 @@ class Ontology():
         entities are identified by IDs.
         '''
         elements = self.root.getElementsByTagName("owl:Class") + self.root.getElementsByTagName("owl:ObjectProperty") + self.root.getElementsByTagName("owl:DatatypeProperty")
-        self.mapping_dict = {self.extract_ID(el, False): self.get_child_node(el, "rdfs:label")[0].firstChild.nodeValue for el in elements if self.get_child_node(el, "rdfs:label")}
+        self.mapping_dict = {self.extract_ID(el, False): self.return_label(el) for el in elements if self.get_child_node(el, "rdfs:label")}
         self.mapping_dict_inv = {self.mapping_dict[key]: key for key in self.mapping_dict}
         return
-        
+    
+    def return_label(self, el):
+        '''
+        Returns label of an element, and also detects language of the label
+        '''
+        label_element = self.get_child_node(el, "rdfs:label")[0]
+        lang = label_element.getAttribute("xml:lang")
+        if lang:
+            self.languages.append(lang)
+        return label_element.firstChild.nodeValue
+
+    def detect_language(self):
+        if self.languages:
+            self.language = max(set(self.languages), key=self.languages.count)
+        else:
+            self.language = "en"
+        print ("Language of ontology is: {}".format(self.language))
+
     def get_child_node(self, element, tag):
         '''
         Returns child node with a specific tag name given DOM element 

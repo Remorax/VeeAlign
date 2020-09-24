@@ -12,18 +12,26 @@ def cos_sim(a,b):
 
 class DataParser():
     """Data parsing class"""
-    def __init__(self, ontologies_in_alignment, language, quick_mode, gt_mappings=None):
+    def __init__(self, ontologies_in_alignment, quick_mode, gt_mappings=None):
         self.ontologies_in_alignment = ontologies_in_alignment
         self.gt_mappings = gt_mappings
         self.enable_quick_mode = quick_mode
-        self.language = language
+        self.language = self.detect_lang()
         if self.language == "en":
             self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed"
         else:
             self.USE_link = "https://tfhub.dev/google/universal-sentence-encoder-multilingual/3?tf-hub-format=compressed"
         self.USE = hub.load(self.USE_link)
         self.stopwords = ["has"]
- 
+    
+    def detect_lang(self):
+        '''
+        Detects language of dataset.
+        If all are english, returns "en" otherwise returns "mu" for multi-lingual.
+        '''
+        langs = flatten([[Ontology(ont).language for ont in ont_pair] for ont_pair in self.ontologies_in_alignment])
+        return "en" if all([ont=="en" for ont in langs]) else "mu"
+
     def extractUSEEmbeddings(self, words):
         # Extracts USE embeddings
         word_embeddings = self.USE(words)

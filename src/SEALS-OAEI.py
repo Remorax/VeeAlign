@@ -24,8 +24,6 @@ config.read(prefix_path + 'src/config.ini')
 logging.info("Prefix path: ", prefix_path)
 
 # Initialize variables from config
-language = str(config["General"]["language"])
-logging.info("Language: ", language)
 quick_mode = str(config["General"]["quick_mode"])
 
 model_path = prefix_path + str(config["Paths"]["load_model_path"])
@@ -43,7 +41,7 @@ batch_size = int(config["Hyperparameters"]["batch_size"])
 test_ontologies = [tuple([ont_name1, ont_name2])]
 
 # Preprocessing and parsing input data for testing
-preprocessing = DataParser(test_ontologies, language, quick_mode)
+preprocessing = DataParser(test_ontologies, quick_mode)
 test_data_ent, test_data_prop, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts_ent, neighbours_dicts_prop, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
 if os.path.isfile(cached_embeddings_path):
