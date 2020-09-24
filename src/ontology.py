@@ -60,7 +60,6 @@ class Ontology():
             self.language = max(set(self.languages), key=self.languages.count)
         else:
             self.language = "en"
-        print ("Language of ontology is: {}".format(self.language))
 
     def get_child_node(self, element, tag):
         '''
