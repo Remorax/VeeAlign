@@ -1,4 +1,4 @@
-import configparser, logging, random, sys
+import configparser, logging, random, sys, pickle
 import numpy as np
 from collections import OrderedDict
 from math import ceil
@@ -105,8 +105,8 @@ def optimize_threshold():
         np.random.shuffle(val_data_f_prop)
 
         # Create two sets of inputs: one for entities and one for properties
-        inputs_pos, nodes_pos, targets_pos = generate_input(val_data_t_ent, 1, neighbours_dicts)
-        inputs_neg, nodes_neg, targets_neg = generate_input(val_data_f_ent, 0, neighbours_dicts)
+        inputs_pos, nodes_pos, targets_pos = generate_input(val_data_t_ent, 1, neighbours_dicts_ent)
+        inputs_neg, nodes_neg, targets_neg = generate_input(val_data_f_ent, 0, neighbours_dicts_ent)
         inputs_pos_prop, nodes_pos_prop, targets_pos_prop = generate_input(val_data_t_prop, 1, neighbours_dicts_prop)
         inputs_neg_prop, nodes_neg_prop, targets_neg_prop = generate_input(val_data_f_prop, 0, neighbours_dicts_prop)
 
@@ -132,7 +132,7 @@ def optimize_threshold():
         batch_size = min(batch_size, len(inputs_all))
         num_batches = int(ceil(len(inputs_all)/batch_size))
         batch_size_prop = int(ceil(len(inputs_all_prop)/num_batches))
-
+        
         for batch_idx in range(num_batches):
             batch_start = batch_idx * batch_size
             batch_end = (batch_idx+1) * batch_size
@@ -187,7 +187,10 @@ def optimize_threshold():
         threshold = low_threshold
         step = 0.001
 
-        val_data_t_tot = [tuple(pair) for pair in np.concatenate((val_data_t_ent, val_data_t_prop), axis=0)]
+        if not val_data_t_prop:
+            val_data_t_tot = val_data_t_ent
+        else:
+            val_data_t_tot = [tuple(pair) for pair in np.concatenate((val_data_t_ent, val_data_t_prop), axis=0)]
         # Iterate over every threshold with step size of 0.001 and calculate all evaluation metrics
         while threshold < high_threshold:
             threshold = round(threshold, 3)
@@ -230,8 +233,7 @@ class VeeAlign(nn.Module):
         self.max_pathlen = max_pathlen
         self.embedding_dim = np.array(emb_vals).shape[1]
         
-        self.threshold = nn.Parameter(torch.DoubleTensor([threshold]))
-        self.threshold.requires_grad = False
+        self.threshold = threshold
 
         self.name_embedding = nn.Embedding(len(emb_vals), self.embedding_dim)
         self.name_embedding.load_state_dict({'weight': torch.from_numpy(np.array(emb_vals))})
@@ -381,7 +383,6 @@ def generate_input(elems, target, neighbours_dicts):
             direct_inputs.append(generate_data_neighbourless(elem))
             direct_targets.append(target)
         except Exception as e:
-            print (e)
             raise
     return inputs, nodes, targets
 
@@ -407,49 +408,50 @@ print ("Number of property pairs:", len(data_prop))
 
 torch.set_default_dtype(torch.float64)
 
-ontologies_in_alignment = [tuple(pair) for pair in ontologies_in_alignment]
-
+ontologies_in_alignment = [tuple([elem.split("/")[-1].split(".")[0] for elem in pair]) for pair in ontologies_in_alignment]
 if ontology_split:
     # We split on the ontology-pair level
     step = int(len(ontologies_in_alignment)/K)
+    
     val_onto = ontologies_in_alignment[len(ontologies_in_alignment)-step+1:]
-    train_data = {elem: data_ent[elem] for elem in data_ent if tuple([el.split("#")[0] for el in elem]) not in val_onto}
-    val_data = {elem: data_ent[elem] for elem in data_ent if tuple([el.split("#")[0] for el in elem]) in val_onto}
-
+    train_data_ent = {elem: data_ent[elem] for elem in data_ent if tuple([el.split("#")[0] for el in elem]) not in val_onto}
+    val_data_ent = {elem: data_ent[elem] for elem in data_ent if tuple([el.split("#")[0] for el in elem]) in val_onto}
+    
     train_data_prop = {elem: data_prop[elem] for elem in data_prop if tuple([el.split("#")[0] for el in elem]) not in val_onto}
     val_data_prop = {elem: data_prop[elem] for elem in data_prop if tuple([el.split("#")[0] for el in elem]) in val_onto}
-
-    train_data_t = [key for key in train_data if train_data[key]]
-    train_data_f = [key for key in train_data if not train_data[key]]
+    
+    train_data_t_ent = [key for key in train_data_ent if train_data_ent[key]]
+    train_data_f_ent = [key for key in train_data_ent if not train_data_ent[key]]
 
     train_data_t_prop = [key for key in train_data_prop if train_data_prop[key]]
     train_data_f_prop = [key for key in train_data_prop if not train_data_prop[key]]
 
-    val_data_t = [key for key in val_data if val_data[key]]
-    val_data_f = [key for key in val_data if not val_data[key]]
+    val_data_t_ent = [key for key in val_data_ent if val_data_ent[key]]
+    val_data_f_ent = [key for key in val_data_ent if not val_data_ent[key]]
 
     val_data_t_prop = [key for key in val_data_prop if val_data_prop[key]]
     val_data_f_prop = [key for key in val_data_prop if not val_data_prop[key]]
+
 else:
     # We split on the mapping-pair level
     ratio = float(1/K)
-    data_t = {elem: data_ent[elem] for elem in data_ent if data_ent[elem]}
-    data_f = {elem: data_ent[elem] for elem in data_ent if not data_ent[elem]}
+    data_t_ent = {elem: data_ent[elem] for elem in data_ent if data_ent[elem]}
+    data_f_ent = {elem: data_ent[elem] for elem in data_ent if not data_ent[elem]}
 
     data_t_prop = {elem: data_prop[elem] for elem in data_prop if data_prop[elem]}
     data_f_prop = {elem: data_prop[elem] for elem in data_prop if not data_prop[elem]}
 
-    data_t_items = list(data_t.keys())
-    data_f_items = list(data_f.keys())
-
-    val_data_t = data_t_items[int((ratio*index)*len(data_t)):int((ratio*index + ratio)*len(data_t))]
-    val_data_f = data_f_items[int((ratio*index)*len(data_f)):int((ratio*index + ratio)*len(data_f))]
-
-    train_data_t = data_t_items[:int(ratio*index*len(data_t))] + data_t_items[int(ratio*(index+1)*len(data_t)):]
-    train_data_f = data_f_items[:int(ratio*index*len(data_f))] + data_f_items[int(ratio*(index+1)*len(data_f)):]
+    data_t_items_ent = list(data_t_ent.keys())
+    data_f_items_ent = list(data_f_ent.keys())
 
     data_t_items_prop = list(data_t_prop.keys())
     data_f_items_prop = list(data_f_prop.keys())
+
+    val_data_t_ent = data_t_items_ent[int((ratio*index)*len(data_t_ent)):int((ratio*index + ratio)*len(data_t_ent))]
+    val_data_f_ent = data_f_items_ent[int((ratio*index)*len(data_f_ent)):int((ratio*index + ratio)*len(data_f_ent))]
+
+    train_data_t_ent = data_t_items_ent[:int(ratio*index*len(data_t_ent))] + data_t_items_ent[int(ratio*(index+1)*len(data_t_ent)):]
+    train_data_f_ent = data_f_items_ent[:int(ratio*index*len(data_f_ent))] + data_f_items_ent[int(ratio*(index+1)*len(data_f_ent)):]
 
     val_data_t_prop = data_t_items_prop[int((ratio*index)*len(data_t_prop)):int((ratio*index + ratio)*len(data_t_prop))]
     val_data_f_prop = data_f_items_prop[int((ratio*index)*len(data_f_prop)):int((ratio*index + ratio)*len(data_f_prop))]
@@ -457,40 +459,40 @@ else:
     train_data_t_prop = data_t_items_prop[:int(ratio*index*len(data_t_prop))] + data_t_items_prop[int(ratio*(index+1)*len(data_t_prop)):]
     train_data_f_prop = data_f_items_prop[:int(ratio*index*len(data_f_prop))] + data_f_items_prop[int(ratio*(index+1)*len(data_f_prop)):]
 
-np.random.shuffle(train_data_f)
-train_data_f = train_data_f[:max_false_examples]
+np.random.shuffle(train_data_f_ent)
+train_data_f_ent = train_data_f_ent[:max_false_examples]
 
 np.random.shuffle(train_data_f_prop)
 train_data_f_prop = train_data_f_prop[:max_false_examples]
 
 # Oversampling to maintain 1:1 ratio between positives and negatives
-train_data_t = np.repeat(train_data_t, ceil(len(train_data_f)/len(train_data_t)), axis=0)
-train_data_t = train_data_t[:len(train_data_f)].tolist()
+train_data_t_ent = np.repeat(train_data_t_ent, ceil(len(train_data_f_ent)/len(train_data_t_ent)), axis=0)
+train_data_t_ent = train_data_t_ent[:len(train_data_f_ent)].tolist()
 
 train_data_t_prop = np.repeat(train_data_t_prop, ceil(len(train_data_f_prop)/len(train_data_t_prop)), axis=0)
 train_data_t_prop = train_data_t_prop[:len(train_data_f_prop)].tolist()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-model = SiameseNetwork().to(device)
+model = VeeAlign(emb_vals).to(device)
 
 optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
 print ("Starting training...")
 
 for epoch in range(num_epochs):
-    inputs_pos, nodes_pos, targets_pos = generate_input(train_data_t, 1, neighbours_dicts)
-    inputs_neg, nodes_neg, targets_neg = generate_input(train_data_f, 0, neighbours_dicts)
+    inputs_pos_ent, nodes_pos_ent, targets_pos_ent = generate_input(train_data_t_ent, 1, neighbours_dicts_ent)
+    inputs_neg_ent, nodes_neg_ent, targets_neg_ent = generate_input(train_data_f_ent, 0, neighbours_dicts_ent)
     inputs_pos_prop, nodes_pos_prop, targets_pos_prop = generate_input(train_data_t_prop, 1, neighbours_dicts_prop)
     inputs_neg_prop, nodes_neg_prop, targets_neg_prop = generate_input(train_data_f_prop, 0, neighbours_dicts_prop)
 
-    inputs_all = list(inputs_pos) + list(inputs_neg)
-    targets_all = list(targets_pos) + list(targets_neg)
-    nodes_all = list(nodes_pos) + list(nodes_neg)
+    inputs_all_ent = list(inputs_pos_ent) + list(inputs_neg_ent)
+    targets_all_ent = list(targets_pos_ent) + list(targets_neg_ent)
+    nodes_all_ent = list(nodes_pos_ent) + list(nodes_neg_ent)
     
-    all_inp = list(zip(inputs_all, targets_all, nodes_all))
-    all_inp_shuffled = random.sample(all_inp, len(all_inp))
-    inputs_all, targets_all, nodes_all = list(zip(*all_inp_shuffled))
+    all_inp_ent = list(zip(inputs_all_ent, targets_all_ent, nodes_all_ent))
+    all_inp_shuffled_ent = random.sample(all_inp_ent, len(all_inp_ent))
+    inputs_all_ent, targets_all_ent, nodes_all_ent = list(zip(*all_inp_shuffled_ent))
 
     inputs_all_prop = list(inputs_pos_prop) + list(inputs_neg_prop)
     targets_all_prop = list(targets_pos_prop) + list(targets_neg_prop)
@@ -503,29 +505,28 @@ for epoch in range(num_epochs):
     all_inp_shuffled_prop = random.sample(all_inp_prop, len(all_inp_prop))
     inputs_all_prop, targets_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
 
-    print ("Inputs prop length: ", len(inputs_all_prop))
-    batch_size = min(batch_size, len(inputs_all))
-    num_batches = int(ceil(len(inputs_all)/batch_size))
+    batch_size = min(batch_size, len(inputs_all_ent))
+    num_batches = int(ceil(len(inputs_all_ent)/batch_size))
     batch_size_prop = int(ceil(len(inputs_all_prop)/num_batches))
 
     for batch_idx in range(num_batches):
-        batch_start = batch_idx * batch_size
-        batch_end = (batch_idx+1) * batch_size
+        batch_start_ent = batch_idx * batch_size
+        batch_end_ent = (batch_idx+1) * batch_size
         batch_start_prop = batch_idx * batch_size_prop
         batch_end_prop = (batch_idx+1) * batch_size_prop
         
-        inputs = np.array(to_feature(inputs_all[batch_start: batch_end]))
-        targets = np.array(targets_all[batch_start: batch_end])
-        nodes = np.array(nodes_all[batch_start: batch_end])
+        inputs_ent = np.array(to_feature(inputs_all_ent[batch_start_ent: batch_end_ent]))
+        targets_ent = np.array(targets_all_ent[batch_start_ent: batch_end_ent])
+        nodes_ent = np.array(nodes_all_ent[batch_start_ent: batch_end_ent])
 
-        inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop]))
+        inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop], max_prop_len))
         targets_prop = np.array(targets_all_prop[batch_start_prop: batch_end_prop])
         nodes_prop = np.array(nodes_all_prop[batch_start_prop: batch_end_prop])
         
-        targets = np.concatenate((targets, targets_prop), axis=0)
+        targets = np.concatenate((targets_ent, targets_prop), axis=0)
         
-        inp_elems = torch.LongTensor(inputs).to(device)
-        node_elems = torch.LongTensor(nodes).to(device)
+        inp_elems = torch.LongTensor(inputs_ent).to(device)
+        node_elems = torch.LongTensor(nodes_ent).to(device)
         targ_elems = torch.DoubleTensor(targets).to(device)
 
         inp_props = torch.LongTensor(inputs_prop).to(device)
