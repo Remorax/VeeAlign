@@ -9,4 +9,4 @@ Please run the following commands to set up the environment:
 1. `conda create --name py37 python=3.7`
 2. `pip3 install -r requirements.txt`
 
-`SEALS-OAEI.py` will run with config parameters described in `config.ini`. Details
+`SEALS-OAEI.py` will run with config parameters described in `config.ini`.
