@@ -132,6 +132,8 @@ def optimize_threshold():
         batch_size = min(batch_size, len(inputs_all))
         num_batches = int(ceil(len(inputs_all)/batch_size))
         batch_size_prop = int(ceil(len(inputs_all_prop)/num_batches))
+
+        for batch_idx in range(num_batches):
             batch_start = batch_idx * batch_size
             batch_end = (batch_idx+1) * batch_size
             batch_start_prop = batch_idx * batch_size_prop
