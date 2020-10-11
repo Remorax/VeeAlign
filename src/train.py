@@ -124,9 +124,15 @@ def optimize_threshold():
         
         all_inp_prop = list(zip(inputs_all_prop, targets_all_prop, nodes_all_prop))
         all_inp_shuffled_prop = random.sample(all_inp_prop, len(all_inp_prop))
-        inputs_all_prop, targets_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
+        if all_inp_shuffled_prop:
+            inputs_all_prop, targets_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
+        else:
+            inputs_all_prop, targets_all_prop, nodes_all_prop = [], [], []
 
-        max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair] 
+        if len(inputs_all_prop) == 0:
+            max_prop_len = 0
+        else:
+            max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair] 
             for elem_pair in inputs_all_prop])
 
         batch_size = min(batch_size, len(inputs_all))
@@ -408,6 +414,7 @@ print ("Number of property pairs:", len(data_prop))
 
 torch.set_default_dtype(torch.float64)
 
+index=0
 ontologies_in_alignment = [tuple([elem.split("/")[-1].split(".")[0] for elem in pair]) for pair in ontologies_in_alignment]
 if ontology_split:
     # We split on the ontology-pair level
@@ -469,8 +476,9 @@ train_data_f_prop = train_data_f_prop[:max_false_examples]
 train_data_t_ent = np.repeat(train_data_t_ent, ceil(len(train_data_f_ent)/len(train_data_t_ent)), axis=0)
 train_data_t_ent = train_data_t_ent[:len(train_data_f_ent)].tolist()
 
-train_data_t_prop = np.repeat(train_data_t_prop, ceil(len(train_data_f_prop)/len(train_data_t_prop)), axis=0)
-train_data_t_prop = train_data_t_prop[:len(train_data_f_prop)].tolist()
+if train_data_t_prop:
+    train_data_t_prop = np.repeat(train_data_t_prop, ceil(len(train_data_f_prop)/len(train_data_t_prop)), axis=0)
+    train_data_t_prop = train_data_t_prop[:len(train_data_f_prop)].tolist()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -498,12 +506,18 @@ for epoch in range(num_epochs):
     targets_all_prop = list(targets_pos_prop) + list(targets_neg_prop)
     nodes_all_prop = list(nodes_pos_prop) + list(nodes_neg_prop)
 
-    max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair] 
+    if len(inputs_all_prop) == 0:
+        max_prop_len = 0
+    else:
+        max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair] 
         for elem_pair in inputs_all_prop])
     
     all_inp_prop = list(zip(inputs_all_prop, targets_all_prop, nodes_all_prop))
     all_inp_shuffled_prop = random.sample(all_inp_prop, len(all_inp_prop))
-    inputs_all_prop, targets_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
+    if all_inp_shuffled_prop:
+        inputs_all_prop, targets_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
+    else:
+        inputs_all_prop, targets_all_prop, nodes_all_prop = [], [], []
 
     batch_size = min(batch_size, len(inputs_all_ent))
     num_batches = int(ceil(len(inputs_all_ent)/batch_size))
