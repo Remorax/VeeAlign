@@ -214,7 +214,7 @@ def generate_input(elems, neighbours_dicts):
     global direct_inputs
     for elem in list(elems):
         try:
-           inputs.append(generate_data(elem, neighbours_dicts))
+            inputs.append(generate_data(elem, neighbours_dicts))
             nodes.append(generate_data_neighbourless(elem))
         except KeyError as e:
             direct_inputs.append(generate_data_neighbourless(elem))
@@ -308,13 +308,16 @@ with torch.no_grad():
     all_inp = list(zip(inputs_all_ent, nodes_all_ent))
     all_inp_shuffled = random.sample(all_inp, len(all_inp))
     inputs_all_ent, nodes_all_ent = list(zip(*all_inp_shuffled))
-
-    all_inp = list(zip(inputs_all_prop, nodes_all_prop))
-    all_inp_shuffled = random.sample(all_inp, len(all_inp))
-    inputs_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled))
+    if inputs_all_prop:
+        
+        all_inp = list(zip(inputs_all_prop, nodes_all_prop))
+        all_inp_shuffled = random.sample(all_inp, len(all_inp))
+        inputs_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled))
     
-    max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair]
-        for elem_pair in inputs_all_prop])
+        max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair]
+            for elem_pair in inputs_all_prop])
+    else:
+        max_prop_len = 0
     print ("Max prop len: ", max_prop_len)
     batch_size = min(batch_size, len(inputs_all_ent))
     num_batches = int(ceil(len(inputs_all_ent)/batch_size))
@@ -329,10 +332,12 @@ with torch.no_grad():
 
         inputs_ent = np.array(to_feature(inputs_all_ent[batch_start: batch_end]))
         nodes_ent = np.array(nodes_all_ent[batch_start: batch_end])
-
-        inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop]))
-        nodes_prop = np.array(nodes_all_prop[batch_start_prop: batch_end_prop])
-
+        if inputs_all_prop:
+            inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop]))
+            nodes_prop = np.array(nodes_all_prop[batch_start_prop: batch_end_prop])
+        else:
+            inputs_prop = []
+            nodes_prop = []
         inp_ents = torch.LongTensor(inputs_ent).to(device)
         node_ents = torch.LongTensor(nodes_ent).to(device)
         inp_props = torch.LongTensor(inputs_prop).to(device)
