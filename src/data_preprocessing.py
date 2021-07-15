@@ -210,14 +210,6 @@ class DataParser():
         # Spelling checker and corrector
         logging.info ("Running spellcheck...")
 
-        url = "https://grammarbot.p.rapidapi.com/check"
-
-        headers = {
-            'x-rapidapi-host': "grammarbot.p.rapidapi.com",
-            'x-rapidapi-key': "9965b01207msh06291e57d6f2c55p1a6a16jsn0fb016da4a62",
-            'content-type': "application/x-www-form-urlencoded"
-            }
-
         inp_spellchecked = []
 
         for concept in inp_resolved:
