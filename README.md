@@ -1,6 +1,6 @@
 # VeeAlign
 
-This repository contains the code for the Attention-based Ontology Alignment system, VeeAlign.
+The following repository contains the code and datasets used for the EMNLP 2021 publication "Multifaceted Context Representation using Dual Attention for Ontology Alignment". The system presented in the paper, VeeAlign, is a dual attention based ontology alignment system that aligns ontologies using a novel multi-faceted context representation approach. It was declared the best performing system in the Conference track for OAEI 2020.
 
 ## Setup
 Please run the following commands: 
