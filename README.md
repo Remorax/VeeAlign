@@ -50,6 +50,12 @@ There are five main script files:
 
 We also provide the datasets used for experimentation, in the `datasets` folder (also included in the data appendix).
 
+## Regarding Spelling-check
+
+One of the preprocessing steps, a spelling checker (and corrector) was implemented using the RapidAPI GrammarBot (https://rapidapi.com/grammarbot/api/grammarbot/). If you wish to use it (for better accuracy), please create an API key on this tool and add it to [line 12 ](https://github.com/Remorax/VeeAlign/blob/master/src/data_preprocessing.py#L12) of data_preprocessing.py. Note that this tool charges for requests beyond a certain limit, so please be mindful of the same.
+
+Using this tool, of course, is optional and currently the script is setup to ignore spell-check.
+
 ## Configuration
 
 This section details in tabular format, the various configurational fields in `config.ini` and the best performing values for each of the datasets.
