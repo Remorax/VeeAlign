@@ -52,7 +52,7 @@ We also provide the datasets used for experimentation, in the `datasets` folder 
 
 ## Regarding Spelling-check
 
-One of the preprocessing steps, a spelling checker (and corrector) was implemented using the RapidAPI GrammarBot (https://rapidapi.com/grammarbot/api/grammarbot/). If you wish to use it (for better accuracy), please create an API key on this tool and add it to [line 12 ](https://github.com/Remorax/VeeAlign/blob/master/src/data_preprocessing.py#L12) of data_preprocessing.py. Note that this tool charges for requests beyond a certain limit, so please be mindful of the same.
+One of the preprocessing steps, a spelling checker (and corrector) was implemented using the RapidAPI GrammarBot (https://rapidapi.com/grammarbot/api/grammarbot/). If you wish to use it (for better accuracy and/or reproducing the results in our work), please create an API key on this tool and add it to [line 12 ](https://github.com/Remorax/VeeAlign/blob/master/src/data_preprocessing.py#L12) of data_preprocessing.py. Note that this tool charges for requests beyond a certain limit, so please be mindful of the same.
 
 Using this tool, of course, is optional and currently the script is setup to ignore spell-check.
 
