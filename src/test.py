@@ -2,7 +2,7 @@ import configparser, sys, logging, random
 import numpy as np
 from collections import OrderedDict
 from math import ceil
-import torch
+import torch, pickle
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
@@ -308,12 +308,19 @@ with torch.no_grad():
     all_inp_shuffled = random.sample(all_inp, len(all_inp))
     inputs_all_ent, nodes_all_ent = list(zip(*all_inp_shuffled))
 
-    all_inp = list(zip(inputs_all_prop, nodes_all_prop))
-    all_inp_shuffled = random.sample(all_inp, len(all_inp))
-    inputs_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled))
-    
-    max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair]
+    if len(inputs_all_prop) == 0:
+        max_prop_len = 0
+    else:
+        max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair] 
         for elem_pair in inputs_all_prop])
+    
+    all_inp_prop = list(zip(inputs_all_prop, nodes_all_prop))
+    all_inp_shuffled_prop = random.sample(all_inp_prop, len(all_inp_prop))
+    if all_inp_shuffled_prop:
+        inputs_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
+    else:
+        inputs_all_prop, nodes_all_prop = [], []
+
     print ("Max prop len: ", max_prop_len)
     batch_size = min(batch_size, len(inputs_all_ent))
     num_batches = int(ceil(len(inputs_all_ent)/batch_size))

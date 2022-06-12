@@ -6,6 +6,7 @@ import torch
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
+from copy import deepcopy
 from ontology import *
 from data_preprocessing import *
 
@@ -56,6 +57,8 @@ lr = float(config["Hyperparameters"]["lr"])
 num_epochs = int(config["Hyperparameters"]["num_epochs"])
 weight_decay = float(config["Hyperparameters"]["weight_decay"])
 batch_size = int(config["Hyperparameters"]["batch_size"])
+validation_interval = int(config["Hyperparameters"]["validation_interval"])
+patience = int(config["Hyperparameters"]["patience"])
 
 reference_alignments = load_alignments(alignment_folder)
 gt_mappings = [tuple([elem.split("/")[-1] for elem in el]) for el in reference_alignments]
@@ -86,7 +89,7 @@ for term in emb_indexer_new:
 direct_inputs, direct_targets = [], []
 threshold_results = {}
 
-def optimize_threshold():
+def optimize_threshold(model):
     '''
     Function to optimise threshold on validation set.
     Calculates performance metrics (precision, recall, F1-score, F2-score, F0.5-score) for a
@@ -393,6 +396,70 @@ def generate_input(elems, target, neighbours_dicts):
             raise
     return inputs, nodes, targets
 
+def tensorize_entities(ent_pos, ent_neg, neighbours_dicts_ent):
+    inputs_pos_ent, nodes_pos_ent, targets_pos_ent = generate_input(ent_pos, 1, neighbours_dicts_ent)
+    inputs_neg_ent, nodes_neg_ent, targets_neg_ent = generate_input(ent_neg, 0, neighbours_dicts_ent)
+    
+    inputs_all_ent = list(inputs_pos_ent) + list(inputs_neg_ent)
+    targets_all_ent = list(targets_pos_ent) + list(targets_neg_ent)
+    nodes_all_ent = list(nodes_pos_ent) + list(nodes_neg_ent)
+    
+    all_inp_ent = list(zip(inputs_all_ent, targets_all_ent, nodes_all_ent))
+    all_inp_shuffled_ent = random.sample(all_inp_ent, len(all_inp_ent))
+    inputs_all_ent, targets_all_ent, nodes_all_ent = list(zip(*all_inp_shuffled_ent))
+
+    return inputs_all_ent, targets_all_ent, nodes_all_ent
+
+def tensorize_properties(prop_pos, prop_neg, neighbours_dicts_prop):
+    inputs_pos_prop, nodes_pos_prop, targets_pos_prop = generate_input(prop_pos, 1, neighbours_dicts_prop)
+    inputs_neg_prop, nodes_neg_prop, targets_neg_prop = generate_input(prop_neg, 0, neighbours_dicts_prop)
+
+    inputs_all_prop = list(inputs_pos_prop) + list(inputs_neg_prop)
+    targets_all_prop = list(targets_pos_prop) + list(targets_neg_prop)
+    nodes_all_prop = list(nodes_pos_prop) + list(nodes_neg_prop)
+
+    if len(inputs_all_prop) == 0:
+        max_prop_len = 0
+    else:
+        max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair] 
+        for elem_pair in inputs_all_prop])
+    
+    all_inp_prop = list(zip(inputs_all_prop, targets_all_prop, nodes_all_prop))
+    all_inp_shuffled_prop = random.sample(all_inp_prop, len(all_inp_prop))
+    if all_inp_shuffled_prop:
+        inputs_all_prop, targets_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
+    else:
+        inputs_all_prop, targets_all_prop, nodes_all_prop = [], [], []
+    return inputs_all_prop, targets_all_prop, nodes_all_prop, max_prop_len
+
+def batch_step(inputs_all_ent, targets_all_ent, nodes_all_ent, inputs_all_prop, targets_all_prop, nodes_all_prop, max_prop_len, batch_idx, batch_size, batch_size_prop):
+    global model, optimizer
+    batch_start_ent = batch_idx * batch_size
+    batch_end_ent = (batch_idx+1) * batch_size
+    batch_start_prop = batch_idx * batch_size_prop
+    batch_end_prop = (batch_idx+1) * batch_size_prop
+    
+    inputs_ent = np.array(to_feature(inputs_all_ent[batch_start_ent: batch_end_ent]))
+    targets_ent = np.array(targets_all_ent[batch_start_ent: batch_end_ent])
+    nodes_ent = np.array(nodes_all_ent[batch_start_ent: batch_end_ent])
+
+    inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop], max_prop_len))
+    targets_prop = np.array(targets_all_prop[batch_start_prop: batch_end_prop])
+    nodes_prop = np.array(nodes_all_prop[batch_start_prop: batch_end_prop])
+    
+    targets = np.concatenate((targets_ent, targets_prop), axis=0)
+    
+    inp_elems = torch.LongTensor(inputs_ent).to(device)
+    node_elems = torch.LongTensor(nodes_ent).to(device)
+    targ_elems = torch.DoubleTensor(targets).to(device)
+
+    inp_props = torch.LongTensor(inputs_prop).to(device)
+    node_props = torch.LongTensor(nodes_prop).to(device)
+
+    optimizer.zero_grad()
+    outputs = model(node_elems, inp_elems, node_props, inp_props)
+    return outputs, targ_elems
+
 def count_non_unk(elem):
     return len([l for l in elem if l!="<UNK>"])
 
@@ -477,6 +544,9 @@ train_data_f_prop = train_data_f_prop[:max_false_examples]
 train_data_t_ent = np.repeat(train_data_t_ent, ceil(len(train_data_f_ent)/len(train_data_t_ent)), axis=0)
 train_data_t_ent = train_data_t_ent[:len(train_data_f_ent)].tolist()
 
+val_data_f_ent = random.sample(val_data_f_ent,len(val_data_t_ent))
+val_data_f_prop = random.sample(val_data_f_prop,len(val_data_t_prop))
+
 if train_data_t_prop:
     train_data_t_prop = np.repeat(train_data_t_prop, ceil(len(train_data_f_prop)/len(train_data_t_prop)), axis=0)
     train_data_t_prop = train_data_t_prop[:len(train_data_f_prop)].tolist()
@@ -489,85 +559,76 @@ optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
 print ("Starting training...")
 
+min_val_loss = 1000
+bad_losses = []
+best_model = None
+training_complete = False
 for epoch in range(num_epochs):
-    inputs_pos_ent, nodes_pos_ent, targets_pos_ent = generate_input(train_data_t_ent, 1, neighbours_dicts_ent)
-    inputs_neg_ent, nodes_neg_ent, targets_neg_ent = generate_input(train_data_f_ent, 0, neighbours_dicts_ent)
-    inputs_pos_prop, nodes_pos_prop, targets_pos_prop = generate_input(train_data_t_prop, 1, neighbours_dicts_prop)
-    inputs_neg_prop, nodes_neg_prop, targets_neg_prop = generate_input(train_data_f_prop, 0, neighbours_dicts_prop)
-
-    inputs_all_ent = list(inputs_pos_ent) + list(inputs_neg_ent)
-    targets_all_ent = list(targets_pos_ent) + list(targets_neg_ent)
-    nodes_all_ent = list(nodes_pos_ent) + list(nodes_neg_ent)
-    
-    all_inp_ent = list(zip(inputs_all_ent, targets_all_ent, nodes_all_ent))
-    all_inp_shuffled_ent = random.sample(all_inp_ent, len(all_inp_ent))
-    inputs_all_ent, targets_all_ent, nodes_all_ent = list(zip(*all_inp_shuffled_ent))
-
-    inputs_all_prop = list(inputs_pos_prop) + list(inputs_neg_prop)
-    targets_all_prop = list(targets_pos_prop) + list(targets_neg_prop)
-    nodes_all_prop = list(nodes_pos_prop) + list(nodes_neg_prop)
-
-    if len(inputs_all_prop) == 0:
-        max_prop_len = 0
-    else:
-        max_prop_len = np.max([[[len(elem) for elem in prop] for prop in elem_pair] 
-        for elem_pair in inputs_all_prop])
-    
-    all_inp_prop = list(zip(inputs_all_prop, targets_all_prop, nodes_all_prop))
-    all_inp_shuffled_prop = random.sample(all_inp_prop, len(all_inp_prop))
-    if all_inp_shuffled_prop:
-        inputs_all_prop, targets_all_prop, nodes_all_prop = list(zip(*all_inp_shuffled_prop))
-    else:
-        inputs_all_prop, targets_all_prop, nodes_all_prop = [], [], []
+    if training_complete:
+        print (f"Early stopping since validation hasn't improved for {patience} consecutive runs.")
+        break
+    inputs_all_ent, targets_all_ent, nodes_all_ent = tensorize_entities(train_data_t_ent, train_data_f_ent, neighbours_dicts_ent)
+    inputs_all_prop, targets_all_prop, nodes_all_prop, max_prop_len = tensorize_properties(train_data_t_prop, train_data_f_prop, neighbours_dicts_prop)
 
     batch_size = min(batch_size, len(inputs_all_ent))
     num_batches = int(ceil(len(inputs_all_ent)/batch_size))
     batch_size_prop = int(ceil(len(inputs_all_prop)/num_batches))
+    
+    inputs_all_ent_val, targets_all_ent_val, nodes_all_ent_val = tensorize_entities(val_data_t_ent, val_data_f_ent, neighbours_dicts_ent)
+    inputs_all_prop_val, targets_all_prop_val, nodes_all_prop_val, max_prop_len_val = tensorize_properties(val_data_t_prop, val_data_f_prop, neighbours_dicts_prop)
+
+    batch_size_val = min(batch_size, len(inputs_all_ent_val))
+    num_batches_val = int(ceil(len(inputs_all_ent_val)/batch_size_val))
+    batch_size_prop_val = int(ceil(len(inputs_all_prop_val)/num_batches_val))
 
     for batch_idx in range(num_batches):
-        batch_start_ent = batch_idx * batch_size
-        batch_end_ent = (batch_idx+1) * batch_size
-        batch_start_prop = batch_idx * batch_size_prop
-        batch_end_prop = (batch_idx+1) * batch_size_prop
+        outputs, targ_elems = batch_step(inputs_all_ent, targets_all_ent, nodes_all_ent, inputs_all_prop, targets_all_prop, nodes_all_prop, max_prop_len, batch_idx, batch_size, batch_size_prop)
         
-        inputs_ent = np.array(to_feature(inputs_all_ent[batch_start_ent: batch_end_ent]))
-        targets_ent = np.array(targets_all_ent[batch_start_ent: batch_end_ent])
-        nodes_ent = np.array(nodes_all_ent[batch_start_ent: batch_end_ent])
-
-        inputs_prop = np.array(pad_prop(inputs_all_prop[batch_start_prop: batch_end_prop], max_prop_len))
-        targets_prop = np.array(targets_all_prop[batch_start_prop: batch_end_prop])
-        nodes_prop = np.array(nodes_all_prop[batch_start_prop: batch_end_prop])
-        
-        targets = np.concatenate((targets_ent, targets_prop), axis=0)
-        
-        inp_elems = torch.LongTensor(inputs_ent).to(device)
-        node_elems = torch.LongTensor(nodes_ent).to(device)
-        targ_elems = torch.DoubleTensor(targets).to(device)
-
-        inp_props = torch.LongTensor(inputs_prop).to(device)
-        node_props = torch.LongTensor(nodes_prop).to(device)
-
-        optimizer.zero_grad()
-        outputs = model(node_elems, inp_elems, node_props, inp_props)
-
         loss = F.mse_loss(outputs, targ_elems)
         loss.backward()
         optimizer.step()
+        
+        if batch_idx%validation_interval == 0:
+            print ("Conducting validation...")
+            model.eval()
+            all_outputs, all_targets = torch.DoubleTensor().to(device), torch.DoubleTensor().to(device)
+            for batch_idx_val in range(num_batches_val):
+                outputs_val, targ_elems_val = batch_step(inputs_all_ent_val, targets_all_ent_val, nodes_all_ent_val, inputs_all_prop_val, targets_all_prop_val, nodes_all_prop_val, max_prop_len_val, batch_idx_val, batch_size_val, batch_size_prop_val)
+                all_outputs = torch.cat((all_outputs, outputs_val))
+                all_targets = torch.cat((all_targets, targ_elems_val))
+            val_loss = F.mse_loss(all_outputs, all_targets)
+            print (f"Validation loss @ Epoch {epoch} Idx {batch_idx} = {val_loss}")
+            if val_loss < min_val_loss:
+                min_val_loss = val_loss
+                bad_losses = []
+                
+                print ("Optimizing threshold for best model...")
+                optimize_threshold(model)
 
-        if batch_idx%5000 == 0:
-            print ("Epoch: {} Idx: {} Loss: {}".format(epoch, batch_idx, loss.item()))  
+                threshold_results_mean = {el: np.mean(threshold_results[el], axis=0) for el in threshold_results}    
+                threshold = max(threshold_results_mean.keys(), key=(lambda key: threshold_results_mean[key][2]))
+
+                model.threshold = threshold
+                print (f"Saving best checkpoint with val loss {val_loss}...")
+                torch.save(model.state_dict(), model_path + "_best.pt")
+            else:
+                bad_losses.append(val_loss)
+                if len(bad_losses) > patience:
+                    training_complete = True
+            model.train()
 
 print ("Training complete!")
 
 model.eval()
 
-print ("Optimizing threshold...")
-optimize_threshold()
+print ("Optimizing threshold for last model...")
+optimize_threshold(model)
 
 threshold_results_mean = {el: np.mean(threshold_results[el], axis=0) for el in threshold_results}    
 threshold = max(threshold_results_mean.keys(), key=(lambda key: threshold_results_mean[key][2]))
 
 model.threshold = threshold
 
-torch.save(model.state_dict(), model_path)
-print ("Done. Saved model at {}".format(model_path))
+torch.save(model.state_dict(), model_path + "_last.pt")
+
+print ("Done. Saved last and best models model at {} and {}".format(model_path + "_last.pt", model_path + "_best.pt"))
