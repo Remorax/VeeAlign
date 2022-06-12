@@ -34,6 +34,7 @@ config.read(prefix_path + 'src/config.ini')
 # Initialize variables from config
 
 quick_mode = str(config["General"]["quick_mode"])
+language = str(config["General"]["language"])
 
 K = int(config["General"]["K"])
 ontology_split = str(config["General"]["ontology_split"]) == "True"
@@ -62,7 +63,7 @@ gt_mappings = [tuple([el.split("#")[0].rsplit(".", 1)[0] +  "#" +  el.split("#")
 print ("Ontologies being aligned are: ", ontologies_in_alignment)
 
 # Preprocessing and parsing input data for training
-preprocessing = DataParser(ontologies_in_alignment, quick_mode, gt_mappings)
+preprocessing = DataParser(ontologies_in_alignment, language, gt_mappings)
 data_ent, data_prop, emb_indexer_new, emb_indexer_inv_new, emb_vals_new, neighbours_dicts_ent, neighbours_dicts_prop, max_types = preprocessing.process(spellcheck, bag_of_neighbours)
 
 if os.path.isfile(cached_embeddings_path):

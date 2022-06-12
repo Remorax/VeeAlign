@@ -214,11 +214,10 @@ def generate_input(elems, neighbours_dicts):
     global direct_inputs
     for elem in list(elems):
         try:
-           inputs.append(generate_data(elem, neighbours_dicts))
+            inputs.append(generate_data(elem, neighbours_dicts))
             nodes.append(generate_data_neighbourless(elem))
         except KeyError as e:
             direct_inputs.append(generate_data_neighbourless(elem))
-            direct_targets.append(target)
         except Exception as e:
             print (e)
             raise
